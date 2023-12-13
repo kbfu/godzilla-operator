@@ -24,6 +24,7 @@ package chaos
 import (
 	"github.com/kbfu/godzilla-operator/controllers/env"
 	"github.com/sirupsen/logrus"
+	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
@@ -37,13 +38,7 @@ var (
 	Client     client.Client
 )
 
-func InitKubeClient() {
-	if KubeClient == nil {
-		fetchConfig()
-	}
-}
-
-func fetchConfig() {
+func InitKubeClient(scheme *runtime.Scheme) {
 	var err error
 	if env.LocalDebug {
 		config, err = clientcmd.BuildConfigFromFlags("", homedir.HomeDir()+"/.kube/config")
@@ -54,7 +49,12 @@ func fetchConfig() {
 		if err != nil {
 			logrus.Fatalf("get client set error, reason: %s", err.Error())
 		}
-		Client, err = client.New(config, client.Options{})
+		Client, err = client.New(config, client.Options{
+			Scheme: scheme,
+		})
+		if err != nil {
+			logrus.Fatalf("get client error, reason: %s", err.Error())
+		}
 	} else {
 		config, err = rest.InClusterConfig()
 		if err != nil {
@@ -64,7 +64,11 @@ func fetchConfig() {
 		if err != nil {
 			logrus.Fatalf("get in cluster client set error, reason: %s", err.Error())
 		}
-		Client, err = client.New(config, client.Options{})
+		Client, err = client.New(config, client.Options{
+			Scheme: scheme,
+		})
+		if err != nil {
+			logrus.Fatalf("get client error, reason: %s", err.Error())
+		}
 	}
-
 }

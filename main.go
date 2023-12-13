@@ -64,7 +64,7 @@ func init() {
 	logrus.SetFormatter(customFormatter)
 	logrus.SetReportCaller(true)
 	env.ParseVars()
-	chaos.InitKubeClient()
+	chaos.InitKubeClient(scheme)
 }
 
 func main() {
@@ -113,13 +113,6 @@ func main() {
 		Scheme: mgr.GetScheme(),
 	}).SetupWithManager(mgr); err != nil {
 		logrus.Error(err, "unable to create controller", "controller", "GodzillaJob")
-		os.Exit(1)
-	}
-	if err = (&controllers.GodzillaJobSnapshotReconciler{
-		Client: mgr.GetClient(),
-		Scheme: mgr.GetScheme(),
-	}).SetupWithManager(mgr); err != nil {
-		logrus.Error(err, "unable to create controller", "controller", "GodzillaJobSnapshot")
 		os.Exit(1)
 	}
 	//+kubebuilder:scaffold:builder
