@@ -18,11 +18,12 @@ package main
 
 import (
 	"flag"
-	"github.com/kbfu/godzilla-operator/controllers/chaos"
-	"github.com/kbfu/godzilla-operator/controllers/env"
 	"os"
 	"path"
 	"strconv"
+
+	"github.com/kbfu/godzilla-operator/controllers/chaos"
+	"github.com/kbfu/godzilla-operator/controllers/env"
 
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	// to ensure that exec-entrypoint and run can make use of them.
@@ -36,9 +37,10 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
+	goruntime "runtime"
+
 	godzillachaosiov1alpha1 "github.com/kbfu/godzilla-operator/api/v1alpha1"
 	"github.com/kbfu/godzilla-operator/controllers"
-	goruntime "runtime"
 	//+kubebuilder:scaffold:imports
 )
 

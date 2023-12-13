@@ -73,6 +73,10 @@ func InitSnapshot(job v1alpha1.GodzillaJob) error {
 	if err != nil {
 		return err
 	}
+	err = Client.Status().Update(context.TODO(), &snapshot)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -88,7 +92,7 @@ func UpdateJobStatus(name, reason string, jobStatus v1alpha1.JobStatus) error {
 	if statusCheck(snapshot.Status.JobStatus, jobStatus) {
 		snapshot.Status.JobStatus = jobStatus
 		snapshot.Status.FailedReason = reason
-		err = Client.Create(context.TODO(), &snapshot)
+		err = Client.Status().Update(context.TODO(), &snapshot)
 		if err != nil {
 			return err
 		}
@@ -122,6 +126,10 @@ out:
 		snapshot.Status.JobStatus = jobStatus
 	}
 	err = Client.Create(context.TODO(), &snapshot)
+	if err != nil {
+		return err
+	}
+	err = Client.Status().Update(context.TODO(), &snapshot)
 	if err != nil {
 		return err
 	}

@@ -22,6 +22,7 @@ resources:
 - api:
     crdVersion: v1
     namespaced: true
+  controller: true
   domain: godzilla-chaos.io
   kind: GodzillaJobSnapshot
   path: github.com/kbfu/godzilla-operator/api/v1alpha1
