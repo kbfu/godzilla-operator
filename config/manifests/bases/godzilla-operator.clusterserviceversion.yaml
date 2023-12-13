@@ -1,0 +1,47 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: '[]'
+    capabilities: Basic Install
+  name: godzilla-operator.v0.0.0
+  namespace: placeholder
+spec:
+  apiservicedefinitions: {}
+  customresourcedefinitions:
+    owned:
+    - description: GodzillaJob is the Schema for the godzillajobs API
+      displayName: Godzilla Job
+      kind: GodzillaJob
+      name: godzillajobs.godzilla-chaos.io
+      version: v1alpha1
+  description: godzilla-operator
+  displayName: godzilla-operator
+  icon:
+  - base64data: ""
+    mediatype: ""
+  install:
+    spec:
+      deployments: null
+    strategy: ""
+  installModes:
+  - supported: false
+    type: OwnNamespace
+  - supported: false
+    type: SingleNamespace
+  - supported: false
+    type: MultiNamespace
+  - supported: true
+    type: AllNamespaces
+  keywords:
+  - chaos
+  links:
+  - name: Godzilla Operator
+    url: https://godzilla-operator.domain
+  maintainers:
+  - email: dzhang87@outlook.com
+    name: kbfu
+  maturity: alpha
+  provider:
+    name: godzilla
+  version: 0.0.0

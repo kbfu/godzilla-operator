@@ -1,0 +1,12 @@
+apiVersion: godzilla-chaos.io/v1alpha1
+kind: GodzillaJob
+metadata:
+  labels:
+    app.kubernetes.io/name: godzillajob
+    app.kubernetes.io/instance: godzillajob-sample
+    app.kubernetes.io/part-of: godzilla-operator
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: godzilla-operator
+  name: godzillajob-sample
+spec:
+  # TODO(user): Add fields here
