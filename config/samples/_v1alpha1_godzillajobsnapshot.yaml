@@ -8,6 +8,7 @@ metadata:
     app.kubernetes.io/managed-by: kustomize
     app.kubernetes.io/created-by: godzilla-operator
   name: test
+  namespace: godzilla-operator-system
 spec:
   steps:
     - - name: delete-log-pod
@@ -32,3 +33,5 @@ spec:
           TOTAL_CHAOS_DURATION: "30"
         image: wxt432/chaos-go-runner:latest
         serviceAccountName: chaos-admin
+status:
+  jobStatus: pending
