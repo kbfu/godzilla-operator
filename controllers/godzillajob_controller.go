@@ -18,7 +18,9 @@ package controllers
 
 import (
 	"context"
+	"github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/util/json"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
@@ -50,12 +52,14 @@ type GodzillaJobReconciler struct {
 func (r *GodzillaJobReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	_ = log.FromContext(ctx)
 
-	// TODO(user): your logic here
 	var job godzillachaosiov1alpha1.GodzillaJob
 	err := r.Get(ctx, req.NamespacedName, &job)
 	if err != nil {
-
+		logrus.Error(err)
+		return ctrl.Result{}, err
 	}
+	data, _ := json.Marshal(job)
+	logrus.Info(string(data))
 	return ctrl.Result{}, nil
 }
 

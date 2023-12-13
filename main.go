@@ -19,11 +19,14 @@ package main
 import (
 	"flag"
 	"os"
+	"path"
+	"strconv"
 
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	// to ensure that exec-entrypoint and run can make use of them.
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 
+	"github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
@@ -33,12 +36,12 @@ import (
 
 	godzillachaosiov1alpha1 "github.com/kbfu/godzilla-operator/api/v1alpha1"
 	"github.com/kbfu/godzilla-operator/controllers"
+	goruntime "runtime"
 	//+kubebuilder:scaffold:imports
 )
 
 var (
-	scheme   = runtime.NewScheme()
-	setupLog = ctrl.Log.WithName("setup")
+	scheme = runtime.NewScheme()
 )
 
 func init() {
@@ -46,6 +49,16 @@ func init() {
 
 	utilruntime.Must(godzillachaosiov1alpha1.AddToScheme(scheme))
 	//+kubebuilder:scaffold:scheme
+
+	customFormatter := new(logrus.TextFormatter)
+	customFormatter.TimestampFormat = "2006-01-02 15:04:05"
+	customFormatter.FullTimestamp = true
+	customFormatter.CallerPrettyfier = func(frame *goruntime.Frame) (function string, file string) {
+		fileName := path.Base(frame.File) + ":" + strconv.Itoa(frame.Line)
+		return "", fileName
+	}
+	logrus.SetFormatter(customFormatter)
+	logrus.SetReportCaller(true)
 }
 
 func main() {
@@ -85,7 +98,7 @@ func main() {
 		// LeaderElectionReleaseOnCancel: true,
 	})
 	if err != nil {
-		setupLog.Error(err, "unable to start manager")
+		logrus.Error(err, "unable to start manager")
 		os.Exit(1)
 	}
 
@@ -93,23 +106,23 @@ func main() {
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
 	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "GodzillaJob")
+		logrus.Error(err, "unable to create controller", "controller", "GodzillaJob")
 		os.Exit(1)
 	}
 	//+kubebuilder:scaffold:builder
 
 	if err := mgr.AddHealthzCheck("healthz", healthz.Ping); err != nil {
-		setupLog.Error(err, "unable to set up health check")
+		logrus.Error(err, "unable to set up health check")
 		os.Exit(1)
 	}
 	if err := mgr.AddReadyzCheck("readyz", healthz.Ping); err != nil {
-		setupLog.Error(err, "unable to set up ready check")
+		logrus.Error(err, "unable to set up ready check")
 		os.Exit(1)
 	}
 
-	setupLog.Info("starting manager")
+	logrus.Info("starting manager")
 	if err := mgr.Start(ctrl.SetupSignalHandler()); err != nil {
-		setupLog.Error(err, "problem running manager")
+		logrus.Error(err, "problem running manager")
 		os.Exit(1)
 	}
 }
