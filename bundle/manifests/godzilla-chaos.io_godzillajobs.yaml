@@ -34,10 +34,34 @@ spec:
           spec:
             description: GodzillaJobSpec defines the desired state of GodzillaJob
             properties:
-              foo:
-                description: Foo is an example field of GodzillaJob. Edit godzillajob_types.go
-                  to remove/update
-                type: string
+              steps:
+                description: 'INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
+                  Important: Run "make" to regenerate code after modifying this file'
+                items:
+                  items:
+                    properties:
+                      config:
+                        additionalProperties:
+                          type: string
+                        type: object
+                      image:
+                        type: string
+                      name:
+                        type: string
+                      serviceAccountName:
+                        type: string
+                      type:
+                        type: string
+                    required:
+                    - config
+                    - name
+                    - serviceAccountName
+                    - type
+                    type: object
+                  type: array
+                type: array
+            required:
+            - steps
             type: object
           status:
             description: GodzillaJobStatus defines the observed state of GodzillaJob

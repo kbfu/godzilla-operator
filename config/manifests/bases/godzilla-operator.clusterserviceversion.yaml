@@ -15,6 +15,12 @@ spec:
       kind: GodzillaJob
       name: godzillajobs.godzilla-chaos.io
       version: v1alpha1
+    - description: GodzillaJobSnapshot is the Schema for the godzillajobsnapshots
+        API
+      displayName: Godzilla Job Snapshot
+      kind: GodzillaJobSnapshot
+      name: godzillajobsnapshots.godzilla-chaos.io
+      version: v1alpha1
   description: godzilla-operator
   displayName: godzilla-operator
   icon:

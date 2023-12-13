@@ -15,13 +15,89 @@ metadata:
               "app.kubernetes.io/name": "godzillajob",
               "app.kubernetes.io/part-of": "godzilla-operator"
             },
-            "name": "godzillajob-sample"
+            "name": "godzillajob-sample",
+            "namespace": "godzilla-operator-system"
           },
-          "spec": null
+          "spec": {
+            "steps": [
+              [
+                {
+                  "config": {
+                    "ANNOTATION_CHECK": "false",
+                    "ANNOTATION_KEY": "litmuschaos.io/chaos",
+                    "APP_LABEL": "app=debug",
+                    "APP_NAMESPACE": "test-chaos",
+                    "CHAOS_INTERVAL": "10",
+                    "FORCE": "false",
+                    "JOB_CLEANUP_POLICY": "",
+                    "LIB": "litmus",
+                    "NODE_LABEL": "",
+                    "PODS_AFFECTED_PERC": "",
+                    "RAMP_TIME": "",
+                    "SEQUENCE": "parallel",
+                    "STATUS_CHECK_DELAY": "2",
+                    "STATUS_CHECK_TIMEOUT": "360",
+                    "TARGET_PODS": "",
+                    "TERMINATION_GRACE_PERIOD_SECONDS": "0",
+                    "TOTAL_CHAOS_DURATION": "30"
+                  },
+                  "image": "wxt432/chaos-go-runner:latest",
+                  "name": "delete-log-pod",
+                  "serviceAccountName": "chaos-admin",
+                  "type": "litmus-pod-delete"
+                }
+              ]
+            ]
+          }
+        },
+        {
+          "apiVersion": "godzilla-chaos.io/v1alpha1",
+          "kind": "GodzillaJobSnapshot",
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/created-by": "godzilla-operator",
+              "app.kubernetes.io/instance": "godzillajobsnapshot-sample",
+              "app.kubernetes.io/managed-by": "kustomize",
+              "app.kubernetes.io/name": "godzillajobsnapshot",
+              "app.kubernetes.io/part-of": "godzilla-operator"
+            },
+            "name": "test"
+          },
+          "spec": {
+            "steps": [
+              [
+                {
+                  "config": {
+                    "ANNOTATION_CHECK": "false",
+                    "ANNOTATION_KEY": "litmuschaos.io/chaos",
+                    "APP_LABEL": "app=debug",
+                    "APP_NAMESPACE": "test-chaos",
+                    "CHAOS_INTERVAL": "10",
+                    "FORCE": "false",
+                    "JOB_CLEANUP_POLICY": "",
+                    "LIB": "litmus",
+                    "NODE_LABEL": "",
+                    "PODS_AFFECTED_PERC": "",
+                    "RAMP_TIME": "",
+                    "SEQUENCE": "parallel",
+                    "STATUS_CHECK_DELAY": "2",
+                    "STATUS_CHECK_TIMEOUT": "360",
+                    "TARGET_PODS": "",
+                    "TERMINATION_GRACE_PERIOD_SECONDS": "0",
+                    "TOTAL_CHAOS_DURATION": "30"
+                  },
+                  "image": "wxt432/chaos-go-runner:latest",
+                  "name": "delete-log-pod",
+                  "serviceAccountName": "chaos-admin",
+                  "type": "litmus-pod-delete"
+                }
+              ]
+            ]
+          }
         }
       ]
     capabilities: Basic Install
-    createdAt: "2023-12-13T07:44:01Z"
+    createdAt: "2023-12-13T14:58:35Z"
     operators.operatorframework.io/builder: operator-sdk-v1.32.0
     operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
   name: godzilla-operator.v0.0.1
@@ -35,6 +111,12 @@ spec:
       kind: GodzillaJob
       name: godzillajobs.godzilla-chaos.io
       version: v1alpha1
+    - description: GodzillaJobSnapshot is the Schema for the godzillajobsnapshots
+        API
+      displayName: Godzilla Job Snapshot
+      kind: GodzillaJobSnapshot
+      name: godzillajobsnapshots.godzilla-chaos.io
+      version: v1alpha1
   description: godzilla-operator
   displayName: godzilla-operator
   icon:
@@ -44,6 +126,30 @@ spec:
     spec:
       clusterPermissions:
       - rules:
+        - apiGroups:
+          - batch
+          resources:
+          - jobs
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - ""
+          resources:
+          - pods
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
         - apiGroups:
           - godzilla-chaos.io
           resources:
@@ -153,6 +259,7 @@ spec:
                 command:
                 - /manager
                 image: controller:latest
+                imagePullPolicy: Always
                 livenessProbe:
                   httpGet:
                     path: /healthz
