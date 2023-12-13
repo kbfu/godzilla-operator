@@ -113,6 +113,13 @@ func main() {
 		logrus.Error(err, "unable to create controller", "controller", "GodzillaJob")
 		os.Exit(1)
 	}
+	if err = (&controllers.GodzillaJobSnapshotReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		logrus.Error(err, "unable to create controller", "controller", "GodzillaJobSnapshot")
+		os.Exit(1)
+	}
 	//+kubebuilder:scaffold:builder
 
 	if err := mgr.AddHealthzCheck("healthz", healthz.Ping); err != nil {
