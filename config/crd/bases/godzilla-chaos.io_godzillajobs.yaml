@@ -49,6 +49,9 @@ spec:
                         type: string
                       image:
                         type: string
+                      lastUpdated:
+                        format: int64
+                        type: integer
                       name:
                         type: string
                       serviceAccountName:
@@ -86,6 +89,9 @@ spec:
                         type: string
                       image:
                         type: string
+                      lastUpdated:
+                        format: int64
+                        type: integer
                       name:
                         type: string
                       serviceAccountName:
