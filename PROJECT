@@ -19,4 +19,11 @@ resources:
   kind: GodzillaJob
   path: github.com/kbfu/godzilla-operator/api/v1alpha1
   version: v1alpha1
+- api:
+    crdVersion: v1
+    namespaced: true
+  domain: godzilla-chaos.io
+  kind: GodzillaJobSnapshot
+  path: github.com/kbfu/godzilla-operator/api/v1alpha1
+  version: v1alpha1
 version: "3"

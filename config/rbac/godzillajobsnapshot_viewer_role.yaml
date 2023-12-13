@@ -1,0 +1,27 @@
+# permissions for end users to view godzillajobsnapshots.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/name: clusterrole
+    app.kubernetes.io/instance: godzillajobsnapshot-viewer-role
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/created-by: godzilla-operator
+    app.kubernetes.io/part-of: godzilla-operator
+    app.kubernetes.io/managed-by: kustomize
+  name: godzillajobsnapshot-viewer-role
+rules:
+- apiGroups:
+  - godzilla-chaos.io
+  resources:
+  - godzillajobsnapshots
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - godzilla-chaos.io
+  resources:
+  - godzillajobsnapshots/status
+  verbs:
+  - get

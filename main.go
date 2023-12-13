@@ -18,6 +18,8 @@ package main
 
 import (
 	"flag"
+	"github.com/kbfu/godzilla-operator/controllers/chaos"
+	"github.com/kbfu/godzilla-operator/controllers/env"
 	"os"
 	"path"
 	"strconv"
@@ -59,6 +61,8 @@ func init() {
 	}
 	logrus.SetFormatter(customFormatter)
 	logrus.SetReportCaller(true)
+	env.ParseVars()
+	chaos.InitKubeClient()
 }
 
 func main() {

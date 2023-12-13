@@ -10,7 +10,7 @@ metadata:
   name: godzillajob-sample
   namespace: godzilla-operator-system
 spec:
-  jobs:
+  steps:
     - - name: delete-log-pod
         type: litmus-pod-delete
         config:

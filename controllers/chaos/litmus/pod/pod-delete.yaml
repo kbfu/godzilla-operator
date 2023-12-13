@@ -1,0 +1,10 @@
+env:
+  SEQUENCE: parallel
+  ANNOTATION_KEY: litmuschaos.io/chaos
+  RAMP_TIME: ''
+  JOB_CLEANUP_POLICY: ''
+  CHAOS_INTERVAL: '10'
+  LIB: litmus
+  ANNOTATION_CHECK: 'false'
+  FORCE: 'false'
+  NODE_LABEL: ''

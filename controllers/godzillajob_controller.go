@@ -18,14 +18,15 @@ package controllers
 
 import (
 	"context"
+	"github.com/kbfu/godzilla-operator/api/v1alpha1"
+	"github.com/kbfu/godzilla-operator/controllers/chaos"
+	"github.com/kbfu/godzilla-operator/controllers/chaos/litmus"
 	"github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/apimachinery/pkg/util/json"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/log"
-
-	godzillachaosiov1alpha1 "github.com/kbfu/godzilla-operator/api/v1alpha1"
+	"sigs.k8s.io/controller-runtime/pkg/controller"
+	"sync"
 )
 
 // GodzillaJobReconciler reconciles a GodzillaJob object
@@ -42,7 +43,7 @@ type GodzillaJobReconciler struct {
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
 // move the current state of the cluster closer to the desired state.
-// TODO(user): Modify the Reconcile function to compare the state specified by
+// Modify the Reconcile function to compare the state specified by
 // the GodzillaJob object against the actual cluster state, and then
 // perform operations to make the cluster state reflect the state specified by
 // the user.
@@ -50,22 +51,50 @@ type GodzillaJobReconciler struct {
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.14.1/pkg/reconcile
 func (r *GodzillaJobReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	_ = log.FromContext(ctx)
-
-	var job godzillachaosiov1alpha1.GodzillaJob
+	var job v1alpha1.GodzillaJob
 	err := r.Get(ctx, req.NamespacedName, &job)
 	if err != nil {
 		logrus.Error(err)
 		return ctrl.Result{}, err
 	}
-	data, _ := json.Marshal(job)
-	logrus.Info(string(data))
+	// run all inside scenarios
+	chaos.OverrideConfig(job.Spec.Steps)
+
+	err = chaos.InitSnapshot(job)
+	if err != nil {
+		logrus.Error(err)
+		return ctrl.Result{}, err
+	}
+	// pre-check before run
+	err = chaos.PreCheck(job)
+	if err != nil {
+		logrus.Error(err)
+		return ctrl.Result{}, err
+	}
+
+	go func() {
+		var wg sync.WaitGroup
+		for _, steps := range job.Spec.Steps {
+			for _, s := range steps {
+				wg.Add(1)
+				s := s
+				go func() {
+					logrus.Infof("running job %s", job.Name)
+					litmus.Run(job.Name, s, job.ObjectMeta.Generation)
+					wg.Done()
+				}()
+			}
+			wg.Wait()
+		}
+		chaos.UpdateJobStatus(job.Name, "", v1alpha1.SuccessStatus)
+	}()
 	return ctrl.Result{}, nil
 }
 
 // SetupWithManager sets up the controller with the Manager.
 func (r *GodzillaJobReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&godzillachaosiov1alpha1.GodzillaJob{}).
+		For(&v1alpha1.GodzillaJob{}).
+		WithOptions(controller.Options{MaxConcurrentReconciles: 5}).
 		Complete(r)
 }
