@@ -8,5 +8,28 @@ metadata:
     app.kubernetes.io/managed-by: kustomize
     app.kubernetes.io/created-by: godzilla-operator
   name: godzillajob-sample
+  namespace: godzilla-operator-system
 spec:
-  # TODO(user): Add fields here
+  jobs:
+    - - name: delete-log-pod
+        type: litmus-pod-delete
+        config:
+          ANNOTATION_CHECK: "false"
+          ANNOTATION_KEY: litmuschaos.io/chaos
+          APP_LABEL: app=debug
+          APP_NAMESPACE: test-chaos
+          CHAOS_INTERVAL: "10"
+          FORCE: "false"
+          JOB_CLEANUP_POLICY: ""
+          LIB: litmus
+          NODE_LABEL: ""
+          PODS_AFFECTED_PERC: ""
+          RAMP_TIME: ""
+          SEQUENCE: parallel
+          STATUS_CHECK_DELAY: "2"
+          STATUS_CHECK_TIMEOUT: "360"
+          TARGET_PODS: ""
+          TERMINATION_GRACE_PERIOD_SECONDS: "0"
+          TOTAL_CHAOS_DURATION: "30"
+        image: wxt432/chaos-go-runner:latest
+        serviceAccountName: chaos-admin

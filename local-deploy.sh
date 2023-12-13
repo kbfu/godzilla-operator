@@ -1,0 +1,1 @@
+make deploy IMG=wxt432/godzilla-operator:dev
