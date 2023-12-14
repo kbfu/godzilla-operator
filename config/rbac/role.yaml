@@ -55,3 +55,29 @@ rules:
   - get
   - patch
   - update
+- apiGroups:
+  - godzilla-chaos.io
+  resources:
+  - godzillajobsnapshots
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - godzilla-chaos.io
+  resources:
+  - godzillajobsnapshots/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - godzilla-chaos.io
+  resources:
+  - godzillajobsnapshots/status
+  verbs:
+  - get
+  - patch
+  - update

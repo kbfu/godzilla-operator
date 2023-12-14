@@ -38,6 +38,9 @@ type GodzillaJobReconciler struct {
 //+kubebuilder:rbac:groups=godzilla-chaos.io,resources=godzillajobs,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=godzilla-chaos.io,resources=godzillajobs/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=godzilla-chaos.io,resources=godzillajobs/finalizers,verbs=update
+//+kubebuilder:rbac:groups=godzilla-chaos.io,resources=godzillajobsnapshots,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=godzilla-chaos.io,resources=godzillajobsnapshots/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=godzilla-chaos.io,resources=godzillajobsnapshots/finalizers,verbs=update
 //+kubebuilder:rbac:groups=batch,resources=jobs,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=core,resources=pods,verbs=get;list;watch;create;update;patch;delete
 

@@ -46,7 +46,6 @@ func InitSnapshot(job v1alpha1.GodzillaJob) error {
 	job.Namespace = env.JobNamespace
 	metadata.Name = fmt.Sprintf("%s-%v", metadata.Name, metadata.Generation)
 	snapshot := v1alpha1.GodzillaJobSnapshot{
-		TypeMeta:   job.TypeMeta,
 		ObjectMeta: metadata,
 		Spec:       v1alpha1.GodzillaJobSnapshotSpec{},
 		Status:     v1alpha1.GodzillaJobSnapshotStatus{JobStatus: v1alpha1.PendingStatus},
