@@ -110,5 +110,9 @@ func ignoreDeletionPredicate() predicate.Predicate {
 			// Ignore updates to CR status in which case metadata.Generation does not change
 			return e.ObjectOld.GetGeneration() != e.ObjectNew.GetGeneration()
 		},
+		DeleteFunc: func(e event.DeleteEvent) bool {
+			// Evaluates to false if the object has been confirmed deleted.
+			return !e.DeleteStateUnknown
+		},
 	}
 }
