@@ -23,11 +23,12 @@ package pod
 
 import (
 	_ "embed"
+	godzillachaosiov1alpha1 "github.com/kbfu/godzilla-operator/api/v1alpha1"
 	"github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/util/yaml"
 )
 
-type PodDelete struct {
+type PodConfig struct {
 	Image              string            `yaml:"image"`
 	ServiceAccountName string            `yaml:"serviceAccountName"`
 	Env                map[string]string `yaml:"env"`
@@ -38,33 +39,50 @@ var (
 	common []byte
 	//go:embed pod-delete.yaml
 	deletePod []byte
+	//go:embed pod-io-stress.yaml
+	podIoStress []byte
+	//go:embed container-kill.yaml
+	containerKill []byte
 )
 
-func PopulateDefaultDeletePod() (config PodDelete) {
+func PopulateDefault(chaosType godzillachaosiov1alpha1.LitmusType) (config PodConfig) {
 	var (
-		commonConfig PodDelete
-		deleteConfig PodDelete
+		commonConfig PodConfig
+		typeConfig   PodConfig
 	)
 	err := yaml.Unmarshal(common, &commonConfig)
 	if err != nil {
 		logrus.Fatalf("unmarshal default pod common yaml file failed, reason: %s", err.Error())
 	}
-	err = yaml.Unmarshal(deletePod, &deleteConfig)
-	if err != nil {
-		logrus.Fatalf("unmarshal pod delete yaml file failed, reason: %s", err.Error())
+	switch chaosType {
+	case godzillachaosiov1alpha1.LitmusPodDelete:
+		err = yaml.Unmarshal(deletePod, &typeConfig)
+		if err != nil {
+			logrus.Fatalf("unmarshal pod delete yaml file failed, reason: %s", err.Error())
+		}
+	case godzillachaosiov1alpha1.LitmusPodIoStress:
+		err = yaml.Unmarshal(podIoStress, &typeConfig)
+		if err != nil {
+			logrus.Fatalf("unmarshal pod io stress yaml file failed, reason: %s", err.Error())
+		}
+	case godzillachaosiov1alpha1.LitmusContainerKill:
+		err = yaml.Unmarshal(podIoStress, &typeConfig)
+		if err != nil {
+			logrus.Fatalf("unmarshal pod container kilel yaml file failed, reason: %s", err.Error())
+		}
 	}
 	config = commonConfig
 	if config.Env == nil {
 		config.Env = make(map[string]string)
 	}
-	if deleteConfig.Image != "" {
-		config.Image = deleteConfig.Image
+	if typeConfig.Image != "" {
+		config.Image = typeConfig.Image
 	}
-	for k, v := range deleteConfig.Env {
+	for k, v := range typeConfig.Env {
 		config.Env[k] = v
 	}
-	if deleteConfig.ServiceAccountName != "" {
-		config.ServiceAccountName = deleteConfig.ServiceAccountName
+	if typeConfig.ServiceAccountName != "" {
+		config.ServiceAccountName = typeConfig.ServiceAccountName
 	}
 
 	return config

@@ -40,8 +40,9 @@ const (
 type LitmusType string
 
 const (
-	LitmusPodDelete   LitmusType = "litmus-pod-delete"
-	LitmusPodIoStress LitmusType = "litmus-pod-io-stress"
+	LitmusPodDelete     LitmusType = "litmus-pod-delete"
+	LitmusPodIoStress   LitmusType = "litmus-pod-io-stress"
+	LitmusContainerKill LitmusType = "litmus-container-kill"
 )
 
 type ChaosStep struct {

@@ -80,6 +80,8 @@ func (r *GodzillaJobReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 
 	go func() {
 		var wg sync.WaitGroup
+		chaos.UpdateJobStatus(fmt.Sprintf("%s-%v", job.Name, job.Generation),
+			"", v1alpha1.RunningStatus)
 		for _, steps := range job.Spec.Steps {
 			for _, s := range steps {
 				wg.Add(1)

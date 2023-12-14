@@ -1,0 +1,6 @@
+env:
+  APP_CONTAINER: ''
+  CHAOS_INTERVAL: '10'
+  CONTAINER_RUNTIME: docker
+  SOCKET_PATH: /var/run/docker.sock
+  SIGNAL: SIGKILL

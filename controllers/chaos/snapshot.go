@@ -106,7 +106,7 @@ func UpdateJobStatus(name, reason string, jobStatus v1alpha1.JobStatus) error {
 	return nil
 }
 
-func UpdateSnapshot(jobName, stepName, reason string, generation int64, stepStatus, jobStatus v1alpha1.JobStatus) error {
+func UpdateSnapshot(jobName, stepName, reason string, generation int64, stepStatus v1alpha1.JobStatus) error {
 	name := fmt.Sprintf("%s-%v", jobName, generation)
 	var snapshot v1alpha1.GodzillaJobSnapshot
 	err := Client.Get(context.TODO(), client.ObjectKey{
@@ -131,14 +131,6 @@ out:
 		}
 	}
 	err = Client.Update(context.TODO(), &snapshot)
-	if err != nil {
-		logrus.Error(err)
-		return err
-	}
-	if statusCheck(snapshot.Status.JobStatus, jobStatus) {
-		snapshot.Status.JobStatus = jobStatus
-	}
-	err = Client.Status().Update(context.TODO(), &snapshot)
 	if err != nil {
 		logrus.Error(err)
 		return err

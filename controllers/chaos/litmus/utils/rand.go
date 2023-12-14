@@ -16,17 +16,16 @@
  * /
  */
 
-package litmus
+package utils
 
-import "github.com/kbfu/godzilla-operator/api/v1alpha1"
+import "math/rand"
 
-func Run(jobName string, step v1alpha1.ChaosStep, generation int64) {
-	switch step.Type {
-	case v1alpha1.LitmusPodDelete:
-		runPodKill(jobName, step, generation)
-	case v1alpha1.LitmusPodIoStress:
-		runPodStress(jobName, step, generation)
-	case v1alpha1.LitmusContainerKill:
-		runContainerKill(jobName, step, generation)
+const letters = "abcdefghijklmnopqrstuvwxyz1234567890"
+
+func RandomString(n int) string {
+	b := make([]byte, n)
+	for i := range b {
+		b[i] = letters[rand.Intn(len(letters))]
 	}
+	return string(b)
 }

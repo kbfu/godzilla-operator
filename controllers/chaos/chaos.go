@@ -32,7 +32,7 @@ import (
 func OverrideConfig(steps [][]v1alpha1.ChaosStep) {
 	for i := range steps {
 		for j := range steps[i] {
-			config := pod.PopulateDefaultDeletePod()
+			config := pod.PopulateDefault(steps[i][j].Type)
 			// override default config
 			for k, v := range config.Env {
 				_, ok := steps[i][j].Config[k]
@@ -68,7 +68,7 @@ func PreCheck(job v1alpha1.GodzillaJob) error {
 				return errors.New(msg)
 			}
 			switch j.Type {
-			case v1alpha1.LitmusPodDelete, v1alpha1.LitmusPodIoStress:
+			case v1alpha1.LitmusPodDelete, v1alpha1.LitmusPodIoStress, v1alpha1.LitmusContainerKill:
 			default:
 				msg := fmt.Sprintf("unsupported type %s", j.Type)
 				err := UpdateJobStatus(fmt.Sprintf("%s-%v", job.Name, job.Generation),
