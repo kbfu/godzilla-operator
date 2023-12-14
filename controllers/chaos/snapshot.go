@@ -24,6 +24,7 @@ import (
 	"github.com/kbfu/godzilla-operator/api/v1alpha1"
 	"github.com/kbfu/godzilla-operator/controllers/env"
 	"github.com/sirupsen/logrus"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -44,11 +45,12 @@ func InitSnapshot(job v1alpha1.GodzillaJob) error {
 	// create snapshot here
 	metadata := job.ObjectMeta
 	job.Namespace = env.JobNamespace
-	metadata.Name = fmt.Sprintf("%s-%v", metadata.Name, metadata.Generation)
 	snapshot := v1alpha1.GodzillaJobSnapshot{
-		ObjectMeta: metadata,
-		Spec:       v1alpha1.GodzillaJobSnapshotSpec{},
-		Status:     v1alpha1.GodzillaJobSnapshotStatus{JobStatus: v1alpha1.PendingStatus},
+		ObjectMeta: v1.ObjectMeta{
+			Name:      fmt.Sprintf("%s-%v", metadata.Name, metadata.Generation),
+			Namespace: job.Namespace,
+		},
+		Spec: v1alpha1.GodzillaJobSnapshotSpec{},
 	}
 	var nestedSteps [][]v1alpha1.ChaosStepSnapshot
 	for i := range job.Spec.Steps {
@@ -70,10 +72,13 @@ func InitSnapshot(job v1alpha1.GodzillaJob) error {
 	snapshot.Spec.Steps = nestedSteps
 	err := Client.Create(context.TODO(), &snapshot)
 	if err != nil {
+		logrus.Error(err)
 		return err
 	}
+	snapshot.Status.JobStatus = v1alpha1.PendingStatus
 	err = Client.Status().Update(context.TODO(), &snapshot)
 	if err != nil {
+		logrus.Error(err)
 		return err
 	}
 	return nil
@@ -86,6 +91,7 @@ func UpdateJobStatus(name, reason string, jobStatus v1alpha1.JobStatus) error {
 		Name:      name,
 	}, &snapshot)
 	if err != nil {
+		logrus.Error(err)
 		return err
 	}
 	if statusCheck(snapshot.Status.JobStatus, jobStatus) {
@@ -93,19 +99,22 @@ func UpdateJobStatus(name, reason string, jobStatus v1alpha1.JobStatus) error {
 		snapshot.Status.FailedReason = reason
 		err = Client.Status().Update(context.TODO(), &snapshot)
 		if err != nil {
+			logrus.Error(err)
 			return err
 		}
 	}
 	return nil
 }
 
-func UpdateSnapshot(jobName, stepName, reason string, stepStatus, jobStatus v1alpha1.JobStatus) error {
+func UpdateSnapshot(jobName, stepName, reason string, generation int64, stepStatus, jobStatus v1alpha1.JobStatus) error {
+	name := fmt.Sprintf("%s-%v", jobName, generation)
 	var snapshot v1alpha1.GodzillaJobSnapshot
 	err := Client.Get(context.TODO(), client.ObjectKey{
 		Namespace: env.JobNamespace,
-		Name:      jobName,
+		Name:      name,
 	}, &snapshot)
 	if err != nil {
+		logrus.Error()
 		return err
 	}
 	logrus.Infof("updating snapshot for %s", snapshot.Name)
@@ -121,15 +130,17 @@ out:
 			}
 		}
 	}
+	err = Client.Update(context.TODO(), &snapshot)
+	if err != nil {
+		logrus.Error(err)
+		return err
+	}
 	if statusCheck(snapshot.Status.JobStatus, jobStatus) {
 		snapshot.Status.JobStatus = jobStatus
 	}
-	err = Client.Create(context.TODO(), &snapshot)
-	if err != nil {
-		return err
-	}
 	err = Client.Status().Update(context.TODO(), &snapshot)
 	if err != nil {
+		logrus.Error(err)
 		return err
 	}
 	return nil

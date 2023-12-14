@@ -1,0 +1,41 @@
+- - type: litmus-pod-delete
+    name: delete-log-pod
+    config:
+      TOTAL_CHAOS_DURATION: '30'
+      APP_LABEL: app=debug
+      CHAOS_INTERVAL: '10'
+      APP_NAMESPACE: test-chaos
+---
+- - type: litmus-pod-delete
+    name: delete-log-pod
+    config:
+      TOTAL_CHAOS_DURATION: '1800'
+      PODS_AFFECTED_PERC: '100'
+      APP_LABEL: matrixorigin.io/component=LogSet
+      CHAOS_INTERVAL: '30'
+---
+- - type: litmus-pod-io-stress
+    name: test-pod-disk-io
+    config:
+      TOTAL_CHAOS_DURATION: '600'
+      APP_LABEL: app=debug
+      APP_NAMESPACE: test-chaos
+      PODS_AFFECTED_PERC: '100'
+      APP_CONTAINER: ''
+      CONTAINER_RUNTIME: containerd
+      SOCKET_PATH: /var/run/containerd/containerd.sock
+      FILESYSTEM_UTILIZATION_BYTES: '40'
+      NUMBER_OF_WORKERS: '4'
+      VOLUME_MOUNT_PATH: /
+---
+- - type: litmus-pod-io-stress
+    name: test-cn-disk-io-stress
+    config:
+      TOTAL_CHAOS_DURATION: '1800'
+      APP_LABEL: matrixorigin.io/component=CNSet
+      PODS_AFFECTED_PERC: '100'
+      CONTAINER_RUNTIME: containerd
+      SOCKET_PATH: /var/run/containerd/containerd.sock
+      FILESYSTEM_UTILIZATION_BYTES: '80'
+      NUMBER_OF_WORKERS: '16'
+      VOLUME_MOUNT_PATH: /var/lib/matrixone

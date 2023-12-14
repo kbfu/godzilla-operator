@@ -1,0 +1,1 @@
+make docker-buildx PLATFORMS=linux/amd64,linux/arm64 IMG=wxt432/godzilla-operator:dev

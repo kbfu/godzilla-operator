@@ -20,6 +20,8 @@ import (
 	"context"
 	"fmt"
 	"github.com/kbfu/godzilla-operator/api/v1alpha1"
+	"github.com/kbfu/godzilla-operator/controllers/chaos"
+	"github.com/kbfu/godzilla-operator/controllers/chaos/litmus"
 	"github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -27,6 +29,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
+	"sync"
 )
 
 // GodzillaJobReconciler reconciles a GodzillaJob object
@@ -60,38 +63,37 @@ func (r *GodzillaJobReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 		logrus.Error(err)
 		return ctrl.Result{}, err
 	}
-	fmt.Println("test")
 	// run all inside scenarios
-	//chaos.OverrideConfig(job.Spec.Steps)
-	//
-	//err = chaos.InitSnapshot(job)
-	//if err != nil {
-	//	logrus.Error(err)
-	//	return ctrl.Result{}, err
-	//}
-	//// pre-check before run
-	//err = chaos.PreCheck(job)
-	//if err != nil {
-	//	logrus.Error(err)
-	//	return ctrl.Result{}, err
-	//}
-	//
-	//go func() {
-	//	var wg sync.WaitGroup
-	//	for _, steps := range job.Spec.Steps {
-	//		for _, s := range steps {
-	//			wg.Add(1)
-	//			s := s
-	//			go func() {
-	//				logrus.Infof("running job %s", job.Name)
-	//				litmus.Run(job.Name, s, job.ObjectMeta.Generation)
-	//				wg.Done()
-	//			}()
-	//		}
-	//		wg.Wait()
-	//	}
-	//	chaos.UpdateJobStatus(job.Name, "", v1alpha1.SuccessStatus)
-	//}()
+	chaos.OverrideConfig(job.Spec.Steps)
+
+	err = chaos.InitSnapshot(job)
+	if err != nil {
+		logrus.Error(err)
+		return ctrl.Result{}, err
+	}
+	// pre-check before run
+	err = chaos.PreCheck(job)
+	if err != nil {
+		logrus.Error(err)
+		return ctrl.Result{}, err
+	}
+
+	go func() {
+		var wg sync.WaitGroup
+		for _, steps := range job.Spec.Steps {
+			for _, s := range steps {
+				wg.Add(1)
+				s := s
+				go func() {
+					logrus.Infof("running job %s", job.Name)
+					litmus.Run(job.Name, s, job.ObjectMeta.Generation)
+					wg.Done()
+				}()
+			}
+			wg.Wait()
+		}
+		chaos.UpdateJobStatus(fmt.Sprintf("%s-%v", job.Name, job.Generation), "", v1alpha1.SuccessStatus)
+	}()
 	return ctrl.Result{}, nil
 }
 
@@ -107,16 +109,10 @@ func (r *GodzillaJobReconciler) SetupWithManager(mgr ctrl.Manager) error {
 func ignoreDeletionPredicate() predicate.Predicate {
 	return predicate.Funcs{
 		UpdateFunc: func(e event.UpdateEvent) bool {
-			if e.ObjectOld.GetDeletionTimestamp() != nil {
-				fmt.Printf("old time %v\n", e.ObjectOld.GetDeletionTimestamp().Unix())
-			}
-			if e.ObjectNew.GetDeletionTimestamp() != nil {
-				fmt.Printf("new time %v\n", e.ObjectNew.GetDeletionTimestamp().Unix())
-			}
 			return e.ObjectOld.GetGeneration() != e.ObjectNew.GetGeneration()
 		},
 		DeleteFunc: func(e event.DeleteEvent) bool {
-			return !e.DeleteStateUnknown
+			return e.DeleteStateUnknown
 		},
 	}
 }
