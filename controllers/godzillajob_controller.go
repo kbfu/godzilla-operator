@@ -107,11 +107,15 @@ func (r *GodzillaJobReconciler) SetupWithManager(mgr ctrl.Manager) error {
 func ignoreDeletionPredicate() predicate.Predicate {
 	return predicate.Funcs{
 		UpdateFunc: func(e event.UpdateEvent) bool {
-			// Ignore updates to CR status in which case metadata.Generation does not change
+			if e.ObjectOld.GetDeletionTimestamp() != nil {
+				fmt.Printf("old time %v\n", e.ObjectOld.GetDeletionTimestamp().Unix())
+			}
+			if e.ObjectNew.GetDeletionTimestamp() != nil {
+				fmt.Printf("new time %v\n", e.ObjectNew.GetDeletionTimestamp().Unix())
+			}
 			return e.ObjectOld.GetGeneration() != e.ObjectNew.GetGeneration()
 		},
 		DeleteFunc: func(e event.DeleteEvent) bool {
-			// Evaluates to false if the object has been confirmed deleted.
 			return !e.DeleteStateUnknown
 		},
 	}
