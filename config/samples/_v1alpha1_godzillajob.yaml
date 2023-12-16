@@ -11,17 +11,16 @@ metadata:
   namespace: godzilla-operator-system
 spec:
   steps:
-    - - name: kill-container
-        type: litmus-container-kill
+    - - type: litmus-pod-io-stress
+        name: test-pod-disk-io
         config:
-          TOTAL_CHAOS_DURATION: '30'
-          PODS_AFFECTED_PERC: '100'
-          APP_NAMESPACE: test-chaos
+          TOTAL_CHAOS_DURATION: '600'
           APP_LABEL: app=debug
-          TARGET_PODS: 'debug-89dbbcf54-dvt46'
+          APP_NAMESPACE: godzilla-operator-system
+          PODS_AFFECTED_PERC: '100'
           APP_CONTAINER: ''
           CONTAINER_RUNTIME: docker
           SOCKET_PATH: /var/run/docker.sock
-          SIGNAL: SIGKILL
-        image: wxt432/chaos-go-runner:latest
-        serviceAccountName: chaos-admin
+          FILESYSTEM_UTILIZATION_BYTES: '40'
+          NUMBER_OF_WORKERS: '4'
+          VOLUME_MOUNT_PATH: /

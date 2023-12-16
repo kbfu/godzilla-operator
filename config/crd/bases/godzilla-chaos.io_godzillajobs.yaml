@@ -56,7 +56,6 @@ spec:
                     required:
                     - config
                     - name
-                    - serviceAccountName
                     - type
                     type: object
                   type: array

@@ -29,10 +29,8 @@ import (
 	batchV1 "k8s.io/api/batch/v1"
 	coreV1 "k8s.io/api/core/v1"
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/watch"
 	"reflect"
 	"strconv"
-	"strings"
 	"time"
 )
 
@@ -138,249 +136,94 @@ func podStressJob(chaosJobName string, step v1alpha1.ChaosStep, generation int64
 }
 
 func runPodStress(chaosJobName string, step v1alpha1.ChaosStep, generation int64) {
-	var job batchV1.Job
 	start := time.Now().Unix()
 	duration, _ := strconv.Atoi(step.Config["TOTAL_CHAOS_DURATION"])
 	elapsed := int(start) + duration
-	go func() {
-		logrus.Infof("creating step %s", step.Name)
-		var targetPods []string
-		if step.Config["TARGET_PODS"] != "" {
-			targetPods = strings.Split(step.Config["TARGET_PODS"], ",")
+	logrus.Infof("creating step %s", step.Name)
+	pods, err := utils.FilterTargetPods(step.Config)
+	if err != nil {
+		chaos.UpdateSnapshot(chaosJobName, step.Name, err.Error(), generation, v1alpha1.FailedStatus)
+		chaos.UpdateJobStatus(fmt.Sprintf("%s-%v", chaosJobName, generation), "", v1alpha1.FailedStatus)
+		return
+	}
+	for i := range pods {
+		// populate the first container name if APP_CONTAINER is empty
+		step.Config["APP_POD"] = pods[i].Name
+		step.Config["CPU_CORES"] = "0"
+		if step.Config["APP_CONTAINER"] == "" {
+			step.Config["APP_CONTAINER"] = pods[i].Spec.Containers[0].Name
 		}
-		var percentage int
-		if step.Config["PODS_AFFECTED_PERC"] == "" {
-			percentage = 0
-		} else {
-			percentage, _ = strconv.Atoi(step.Config["PODS_AFFECTED_PERC"])
-		}
-
-		var (
-			pods    []coreV1.Pod
-			allPods []coreV1.Pod
-		)
-
-		// if TARGET_PODS is not empty, use it
-		if len(targetPods) > 0 {
-			for _, targetPod := range targetPods {
-				targetPod = strings.TrimSpace(targetPod)
-				podObject, err := chaos.KubeClient.CoreV1().Pods(step.Config["APP_NAMESPACE"]).Get(context.TODO(), targetPod, metaV1.GetOptions{})
-				if err != nil {
-					// update status
-					chaos.UpdateSnapshot(chaosJobName, step.Name, err.Error(), generation, v1alpha1.FailedStatus)
-					chaos.UpdateJobStatus(chaosJobName, "", v1alpha1.FailedStatus)
-					return
-				}
-				pods = append(pods, *podObject)
-			}
-		} else {
-			// check label
-			podList, err := chaos.KubeClient.CoreV1().Pods(step.Config["APP_NAMESPACE"]).List(context.TODO(), metaV1.ListOptions{
-				LabelSelector: step.Config["APP_LABEL"],
-				FieldSelector: "status.phase=Running",
-			})
-			if err != nil {
-				// update status
-				chaos.UpdateSnapshot(chaosJobName, step.Name, err.Error(), generation, v1alpha1.FailedStatus)
-				chaos.UpdateJobStatus(chaosJobName, "", v1alpha1.FailedStatus)
-				return
-			}
-			for i := range podList.Items {
-				for _, condition := range podList.Items[i].Status.Conditions {
-					if condition.Type == coreV1.ContainersReady && condition.Status == coreV1.ConditionTrue {
-						if podList.Items[i].ObjectMeta.DeletionTimestamp == nil {
-							allPods = append(allPods, podList.Items[i])
-							pods = append(pods, podList.Items[i])
-						}
-					}
-				}
-			}
-		}
-		logrus.Infof("the total running pods is %d", len(allPods))
-		// set the pods as percentage
-		if percentage == 0 {
-			pods = pods[:1]
-		} else {
-			pods = pods[:len(pods)*percentage/100]
-		}
-		var podNames []string
-		for i := range pods {
-			podNames = append(podNames, pods[i].Name)
-		}
-		logrus.Infof("the target pods are %v", podNames)
-
-		for _, podObject := range pods {
-			if podObject.Status.Phase == coreV1.PodRunning {
-				// need to fetch the target node name
-				nodeName := podObject.Spec.NodeName
-				podName := podObject.Name
-				step.Config["APP_POD"] = podName
-				step.Config["CPU_CORES"] = "0"
-				if step.Config["APP_CONTAINER"] == "" {
-					step.Config["APP_CONTAINER"] = podObject.Spec.Containers[0].Name
-				}
-				step.Config["FILESYSTEM_UTILIZATION_PERCENTAGE"] = "0"
-				step.Config["STRESS_TYPE"] = "pod-io-stress"
-				job = podStressJob(chaosJobName, step, generation, nodeName, podName)
-				_, err := chaos.KubeClient.BatchV1().Jobs(env.JobNamespace).Create(context.TODO(), &job, metaV1.CreateOptions{})
-				if err != nil {
-					// update status
-					chaos.UpdateSnapshot(chaosJobName, step.Name, err.Error(), generation, v1alpha1.FailedStatus)
-					chaos.UpdateJobStatus(chaosJobName, "", v1alpha1.FailedStatus)
-					return
-				}
-			}
-		}
-		logrus.Infof("step %s created", step.Name)
-
-		// step status started
-		chaos.UpdateSnapshot(chaosJobName, step.Name, "", generation, v1alpha1.RunningStatus)
-
-		// only label pods needs to be watched
-		w, err := chaos.KubeClient.CoreV1().Pods(step.Config["APP_NAMESPACE"]).Watch(context.TODO(), metaV1.ListOptions{
-			LabelSelector: step.Config["APP_LABEL"],
-		})
+		step.Config["FILESYSTEM_UTILIZATION_PERCENTAGE"] = "0"
+		step.Config["STRESS_TYPE"] = "pod-io-stress"
+		job := podStressJob(chaosJobName, step, generation, pods[i].Spec.NodeName, pods[i].Name)
+		_, err := chaos.KubeClient.BatchV1().Jobs(env.JobNamespace).Create(context.TODO(), &job, metaV1.CreateOptions{})
 		if err != nil {
 			// update status
 			chaos.UpdateSnapshot(chaosJobName, step.Name, err.Error(), generation, v1alpha1.FailedStatus)
-			chaos.UpdateJobStatus(chaosJobName, "", v1alpha1.FailedStatus)
+			chaos.UpdateJobStatus(fmt.Sprintf("%s-%v", chaosJobName, generation), "", v1alpha1.FailedStatus)
 			return
 		}
-		logrus.Infof("watching for step %s", step.Name)
+	}
+	logrus.Infof("pods for step %s created", step.Name)
 
-		for event := range w.ResultChan() {
-			// check timeout
-			if elapsed < int(time.Now().Unix()) {
-				logrus.Infof("watch for step %s ended", step.Name)
-				w.Stop()
-				return
-			}
-
-			if event.Object != nil {
-				if reflect.ValueOf(event.Object).Type().Elem().Name() == "Pod" {
-					podObject := event.Object.(*coreV1.Pod)
-					switch event.Type {
-					case watch.Modified:
-						if podObject.Status.Phase == coreV1.PodRunning {
-							for _, condition := range podObject.Status.Conditions {
-								if condition.Type == coreV1.ContainersReady && condition.Status == coreV1.ConditionTrue {
-									if podObject.ObjectMeta.DeletionTimestamp == nil {
-										// detect newly ready pod
-										// if the pod is in the list, just start a new chaos pod
-										logrus.Infof("new running pod %s detected, step %s",
-											podObject.Name, step.Name)
-										for _, p := range pods {
-											if p.Name == podObject.Name {
-												if elapsed > int(time.Now().Unix()) {
-													logrus.Infof("scheduling new chaos job for pod %s, step %s",
-														podObject.Name, step.Name)
-													nodeName := podObject.Spec.NodeName
-													podName := podObject.Name
-													step.Config["APP_POD"] = podName
-													step.Config["CPU_CORES"] = "0"
-													if step.Config["APP_CONTAINER"] == "" {
-														step.Config["APP_CONTAINER"] = podObject.Spec.Containers[0].Name
-													}
-													step.Config["TOTAL_CHAOS_DURATION"] = fmt.Sprintf("%v", elapsed-int(time.Now().Unix()))
-													step.Config["FILESYSTEM_UTILIZATION_PERCENTAGE"] = "0"
-													step.Config["STRESS_TYPE"] = "pod-io-stress"
-													job = podStressJob(chaosJobName, step, generation, nodeName, podName)
-													_, err := chaos.KubeClient.BatchV1().Jobs(env.JobNamespace).Create(context.TODO(), &job, metaV1.CreateOptions{})
-													if err != nil {
-														// update status
-														chaos.UpdateSnapshot(chaosJobName, step.Name, err.Error(), generation, v1alpha1.FailedStatus)
-														chaos.UpdateJobStatus(chaosJobName, "", v1alpha1.FailedStatus)
-														w.Stop()
-														return
-													}
-													break
-												}
-											}
-										}
-										existed := false
-										for _, p := range allPods {
-											if p.Name == podObject.Name {
-												existed = true
-												break
-											}
-										}
-										// if not in all pods
-										if !existed {
-											allPods = append(allPods, *podObject)
-											expected := 0
-											if percentage == 0 {
-												expected = 1
-											} else {
-												expected = len(allPods) * percentage / 100
-											}
-											if expected > len(pods) && elapsed > int(time.Now().Unix()) {
-												logrus.Infof("need to add a new job for the increment, scheduling new chaos job for pod %s, job %s",
-													podObject.Name, step.Name)
-												// need to scale up
-												nodeName := podObject.Spec.NodeName
-												podName := podObject.Name
-												step.Config["APP_POD"] = podName
-												step.Config["CPU_CORES"] = "0"
-												if step.Config["APP_CONTAINER"] == "" {
-													step.Config["APP_CONTAINER"] = podObject.Spec.Containers[0].Name
-												}
-												step.Config["TOTAL_CHAOS_DURATION"] = fmt.Sprintf("%v", elapsed-int(time.Now().Unix()))
-												step.Config["FILESYSTEM_UTILIZATION_PERCENTAGE"] = "0"
-												step.Config["STRESS_TYPE"] = "pod-io-stress"
-												job = podStressJob(chaosJobName, step, generation, nodeName, podName)
-												_, err := chaos.KubeClient.BatchV1().Jobs(env.JobNamespace).Create(context.TODO(), &job, metaV1.CreateOptions{})
-												if err != nil {
-													// update status
-													chaos.UpdateSnapshot(chaosJobName, step.Name, err.Error(), generation, v1alpha1.FailedStatus)
-													chaos.UpdateJobStatus(chaosJobName, "", v1alpha1.FailedStatus)
-													w.Stop()
-													return
-												}
-												pods = append(pods, *podObject)
-											}
-										}
-									}
-								}
-							}
-						}
-					case watch.Deleted:
-						// detect the deleted pod
-						for i := range pods {
-							if pods[i].Name == podObject.Name {
-								logrus.Infof("new added pod %s detected, step %s",
-									podObject.Name, step.Name)
-								// remove from the pods list
-								pods = append(pods[:i], pods[i+1:]...)
-								break
-							}
-						}
-						for i := range allPods {
-							if allPods[i].Name == podObject.Name {
-								logrus.Infof("remove %s from the allPods, step %s",
-									podObject.Name, step.Name)
-								// remove from the pods list
-								allPods = append(allPods[:i], allPods[i+1:]...)
-								break
-							}
-						}
+	// watch for the status
+	w, err := chaos.KubeClient.CoreV1().Pods(env.JobNamespace).Watch(context.TODO(), metaV1.ListOptions{
+		LabelSelector: fmt.Sprintf("chaos.job.generation=%v,chaos.step.name=%s,chaos.job.name=%s", generation, step.Name, chaosJobName),
+	})
+	if err != nil {
+		logrus.Errorf("step %s status watch failed, reason: %s", step.Name, err.Error())
+		// update status
+		chaos.UpdateSnapshot(chaosJobName, step.Name, err.Error(), generation, v1alpha1.FailedStatus)
+		chaos.UpdateJobStatus(fmt.Sprintf("%s-%v", chaosJobName, generation), "", v1alpha1.FailedStatus)
+		return
+	}
+	logrus.Infof("watching for step %s", step.Name)
+	for event := range w.ResultChan() {
+		if event.Object != nil {
+			if reflect.ValueOf(event.Object).Type().Elem().Name() == "Pod" {
+				podObject := event.Object.(*coreV1.Pod)
+				if podObject.Status.Phase == coreV1.PodSucceeded || podObject.Status.Phase == coreV1.PodFailed {
+					// cleanup
+					logrus.Infof("step %s finished, starting cleanup", step.Name)
+					err = chaos.CleanJob(chaosJobName, step, generation)
+					if err != nil {
+						logrus.Errorf("step %s cleanup failed, reason: %s", step.Name, err.Error())
+						// update status
+						chaos.UpdateSnapshot(chaosJobName, step.Name, err.Error(), generation, v1alpha1.FailedStatus)
+						chaos.UpdateJobStatus(fmt.Sprintf("%s-%v", chaosJobName, generation), "", v1alpha1.FailedStatus)
+						w.Stop()
+						return
+					}
+					logrus.Infof("step %s cleanup done", step.Name)
+					switch podObject.Status.Phase {
+					case coreV1.PodSucceeded:
+						// update status
+						chaos.UpdateSnapshot(chaosJobName, step.Name, "", generation, v1alpha1.SuccessStatus)
+					case coreV1.PodFailed:
+						// update status
+						chaos.UpdateSnapshot(chaosJobName, step.Name, "chaos step pod running failed", generation,
+							v1alpha1.FailedStatus)
+						chaos.UpdateJobStatus(fmt.Sprintf("%s-%v", chaosJobName, generation), "", v1alpha1.FailedStatus)
+					default:
+						// update status
+						chaos.UpdateSnapshot(chaosJobName, step.Name, "", generation, v1alpha1.UnknownStatus)
+						chaos.UpdateJobStatus(fmt.Sprintf("%s-%v", chaosJobName, generation), "", v1alpha1.UnknownStatus)
+					}
+					w.Stop()
+					break
+				} else {
+					// timeout, mark to failed status
+					if elapsed+120 < int(time.Now().Unix()) {
+						// update status
+						chaos.UpdateSnapshot(chaosJobName, step.Name, "chaos step pod not started", generation, v1alpha1.FailedStatus)
+						chaos.UpdateJobStatus(fmt.Sprintf("%s-%v", chaosJobName, generation), "", v1alpha1.FailedStatus)
+						logrus.Infof("step %s failed, starting cleanup", step.Name)
+						chaos.CleanJob(chaosJobName, step, generation)
+						w.Stop()
+						break
 					}
 				}
 			}
 		}
-	}()
-	// todo maybe this is not very schoen
-	time.Sleep(time.Duration(duration) * time.Second)
-	// need cleanup here
-	logrus.Infof("step %s finished, starting cleanup", step.Name)
-	err := chaos.CleanJob(chaosJobName, step, generation)
-	if err != nil {
-		logrus.Errorf("step %s cleanup failed, reason: %s", step.Name, err.Error())
-		// update status
-		chaos.UpdateSnapshot(chaosJobName, step.Name, err.Error(), generation, v1alpha1.FailedStatus)
-		chaos.UpdateJobStatus(chaosJobName, "", v1alpha1.FailedStatus)
-		return
 	}
-	logrus.Infof("step %s cleanup done", step.Name)
-	// set status to success
-	chaos.UpdateSnapshot(chaosJobName, step.Name, "", generation, v1alpha1.SuccessStatus)
 }

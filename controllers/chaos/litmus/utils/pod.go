@@ -20,6 +20,7 @@ package utils
 
 import (
 	"context"
+	"errors"
 	"github.com/kbfu/godzilla-operator/controllers/chaos"
 	"github.com/sirupsen/logrus"
 	coreV1 "k8s.io/api/core/v1"
@@ -80,6 +81,10 @@ func FilterTargetPods(config map[string]string) (pods []coreV1.Pod, err error) {
 	var podNames []string
 	for i := range pods {
 		podNames = append(podNames, pods[i].Name)
+	}
+	if len(pods) == 0 {
+		err = errors.New("no pods found, step ")
+		return
 	}
 	logrus.Infof("the target pods are %v", podNames)
 	return

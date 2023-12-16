@@ -1,0 +1,59 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  labels:
+    app: chaos
+  name: chaos
+  namespace: godzilla-operator-system
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      terminationGracePeriodSeconds: 0 # 参数化
+      serviceAccountName: chaos-admin # 参数化
+      nodeName: colima # 传入
+      volumes:
+        - name: socket-path
+          hostPath:
+            path: /var/run/docker.sock # 参数化
+      containers:
+        - command:
+            - /bin/sh
+          #            - -c
+          #            - ./helpers -name container-kill
+          tty: true
+          stdin: true
+          image: wxt432/chaos-go-runner:latest
+          imagePullPolicy: Always
+          name: chaos
+          env:
+            - name: APP_POD
+              value: 'debug-89dbbcf54-4lvbd' # 参数化
+            - name: APP_CONTAINER
+              value: 'alpine' # 可以传入默认第一个容器的名字，参数化
+            - name: TOTAL_CHAOS_DURATION
+              value: '30' # 参数化
+            - name: CHAOS_INTERVAL
+              value: '5'
+            - name: CONTAINER_RUNTIME
+              value: docker # 参数化, containerd, docker, crio
+            - name: SOCKET_PATH
+              value: /var/run/docker.sock # 参数化
+            - name: SIGNAL
+              value: SIGKILL
+            - name: APP_NAMESPACE
+              value: test-chaos
+            - name: STATUS_CHECK_TIMEOUT
+              value: '360'
+            - name: STATUS_CHECK_DELAY
+              value: '2'
+          volumeMounts:
+            - name: socket-path
+              mountPath: /var/run/docker.sock # 参数化
+          securityContext:
+            privileged: false # 这里如果用crio需要true,不然可以false
+          resources:
+            limits:
+              memory: 128Mi
+              cpu: 100m
+  backoffLimit: 0

@@ -50,7 +50,7 @@ type ChaosStep struct {
 	Type               LitmusType        `json:"type"`
 	Config             map[string]string `json:"config"`
 	Image              string            `json:"image,omitempty"`
-	ServiceAccountName string            `json:"serviceAccountName"`
+	ServiceAccountName string            `json:"serviceAccountName,omitempty"`
 }
 
 // GodzillaJobSpec defines the desired state of GodzillaJob
