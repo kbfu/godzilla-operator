@@ -149,12 +149,9 @@ func runPodStress(chaosJobName string, step v1alpha1.ChaosStep, generation int64
 	for i := range pods {
 		// populate the first container name if APP_CONTAINER is empty
 		step.Config["APP_POD"] = pods[i].Name
-		step.Config["CPU_CORES"] = "0"
 		if step.Config["APP_CONTAINER"] == "" {
 			step.Config["APP_CONTAINER"] = pods[i].Spec.Containers[0].Name
 		}
-		step.Config["FILESYSTEM_UTILIZATION_PERCENTAGE"] = "0"
-		step.Config["STRESS_TYPE"] = "pod-io-stress"
 		job := podStressJob(chaosJobName, step, generation, pods[i].Spec.NodeName, pods[i].Name)
 		_, err := chaos.KubeClient.BatchV1().Jobs(env.JobNamespace).Create(context.TODO(), &job, metaV1.CreateOptions{})
 		if err != nil {

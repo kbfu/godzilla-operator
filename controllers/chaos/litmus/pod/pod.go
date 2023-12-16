@@ -43,6 +43,8 @@ var (
 	podIoStress []byte
 	//go:embed container-kill.yaml
 	containerKill []byte
+	//go:embed pod-memory-stress.yaml
+	podMemoryStress []byte
 )
 
 func PopulateDefault(chaosType godzillachaosiov1alpha1.LitmusType) (config PodConfig) {
@@ -66,9 +68,14 @@ func PopulateDefault(chaosType godzillachaosiov1alpha1.LitmusType) (config PodCo
 			logrus.Fatalf("unmarshal pod io stress yaml file failed, reason: %s", err.Error())
 		}
 	case godzillachaosiov1alpha1.LitmusContainerKill:
-		err = yaml.Unmarshal(podIoStress, &typeConfig)
+		err = yaml.Unmarshal(containerKill, &typeConfig)
 		if err != nil {
-			logrus.Fatalf("unmarshal pod container kilel yaml file failed, reason: %s", err.Error())
+			logrus.Fatalf("unmarshal pod container kill yaml file failed, reason: %s", err.Error())
+		}
+	case godzillachaosiov1alpha1.LitmusPodMemoryStress:
+		err = yaml.Unmarshal(podMemoryStress, &typeConfig)
+		if err != nil {
+			logrus.Fatalf("unmarshal pod memory stress yaml file failed, reason: %s", err.Error())
 		}
 	}
 	config = commonConfig
