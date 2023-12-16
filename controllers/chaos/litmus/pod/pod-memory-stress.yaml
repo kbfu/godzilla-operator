@@ -4,5 +4,5 @@ env:
   SOCKET_PATH: /var/run/docker.sock
   NUMBER_OF_WORKERS: '4'
   MEMORY_CONSUMPTION: '100'
-  STRESS_TYPE: pod-io-stress
+  STRESS_TYPE: pod-memory-stress
   CPU_CORES: '0'

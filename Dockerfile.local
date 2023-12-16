@@ -1,0 +1,6 @@
+FROM alpine:3.18
+WORKDIR /
+COPY manager .
+USER 65532:65532
+
+ENTRYPOINT ["/manager"]
