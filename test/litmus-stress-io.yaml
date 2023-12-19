@@ -32,33 +32,17 @@ spec:
           name: chaos
           env:
             - name: APP_POD
-              value: debug-7f4fd744cb-rvr7h # 参数化
-            - name: STRESS_TYPE
-              value: 'pod-io-stress' # 参数化, pod-cpu-stress, pod-memory-stress, pod-io-stress
-            - name: APP_CONTAINER
-              value: 'alpine' # 可以传入默认第一个容器的名字，参数化
-            - name: TOTAL_CHAOS_DURATION
-              value: '600' # 参数化
+              value: debug-7c685dd495-llhfn # 参数化
             - name: APP_NAMESPACE
-              value: test-chaos # 参数化
+              value: godzilla-operator-system # 参数化
             - name: CONTAINER_RUNTIME
               value: docker # 参数化, containerd, docker, crio
             - name: SOCKET_PATH
               value: /var/run/docker.sock # 参数化
             - name: CPU_CORES
-              value: '0' # 参数化,不用cpu故障的时候置0
+              value: '4' # 参数化,不用cpu故障的时候置0
             - name: CPU_LOAD
               value: '' # 参数化
-            - name: FILESYSTEM_UTILIZATION_PERCENTAGE
-              value: '0' # 参数化
-            - name: FILESYSTEM_UTILIZATION_BYTES
-              value: '40' # 参数化
-            - name: NUMBER_OF_WORKERS
-              value: '4' # 参数化
-            - name: MEMORY_CONSUMPTION
-              value: '' # 参数化
-            - name: VOLUME_MOUNT_PATH
-              value: '/root' # 参数化
           volumeMounts:
             - name: socket-path
               mountPath: /var/run/docker.sock # 参数化

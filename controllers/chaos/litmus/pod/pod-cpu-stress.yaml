@@ -1,0 +1,7 @@
+env:
+  APP_CONTAINER: ''
+  CONTAINER_RUNTIME: docker
+  SOCKET_PATH: /var/run/docker.sock
+  STRESS_TYPE: pod-cpu-stress
+  CPU_CORES: '0'
+  CPU_LOAD: '0'

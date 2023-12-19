@@ -44,6 +44,7 @@ const (
 	LitmusPodIoStress     LitmusType = "litmus-pod-io-stress"
 	LitmusContainerKill   LitmusType = "litmus-container-kill"
 	LitmusPodMemoryStress LitmusType = "litmus-pod-memory-stress"
+	LitmusPodCpuStress    LitmusType = "litmus-pod-cpu-stress"
 )
 
 type ChaosStep struct {

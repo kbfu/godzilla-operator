@@ -18,15 +18,20 @@
 
 package litmus
 
-import "github.com/kbfu/godzilla-operator/api/v1alpha1"
+import (
+	"github.com/kbfu/godzilla-operator/api/v1alpha1"
+	"github.com/sirupsen/logrus"
+)
 
 func Run(jobName string, step v1alpha1.ChaosStep, generation int64) {
 	switch step.Type {
 	case v1alpha1.LitmusPodDelete:
 		runPodKill(jobName, step, generation)
-	case v1alpha1.LitmusPodIoStress:
+	case v1alpha1.LitmusPodIoStress, v1alpha1.LitmusPodMemoryStress, v1alpha1.LitmusPodCpuStress:
 		runPodStress(jobName, step, generation)
 	case v1alpha1.LitmusContainerKill:
 		runContainerKill(jobName, step, generation)
+	default:
+		logrus.Errorf("%s type not found", step.Type)
 	}
 }
