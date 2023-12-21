@@ -125,11 +125,7 @@ func runContainerKill(chaosJobName string, step v1alpha1.ChaosStep, generation i
 }
 
 func containerKillJob(chaosJobName string, step v1alpha1.ChaosStep, generation int64, nodeName, podName string) batchV1.Job {
-	var (
-		backOffLimit int32 = 0
-		envs         []coreV1.EnvVar
-		privileged   = true
-	)
+	var envs []coreV1.EnvVar
 
 	termination, _ := strconv.ParseInt(step.Config["TERMINATION_GRACE_PERIOD_SECONDS"], 10, 64)
 	jobName := fmt.Sprintf("%s-%s", step.Name, utils.RandomString(10))
@@ -154,7 +150,7 @@ func containerKillJob(chaosJobName string, step v1alpha1.ChaosStep, generation i
 			},
 		},
 		Spec: batchV1.JobSpec{
-			BackoffLimit: &backOffLimit,
+			BackoffLimit: utils.PtrData(int32(0)),
 			Template: coreV1.PodTemplateSpec{
 				ObjectMeta: metaV1.ObjectMeta{
 					Labels: map[string]string{
@@ -165,6 +161,7 @@ func containerKillJob(chaosJobName string, step v1alpha1.ChaosStep, generation i
 					},
 				},
 				Spec: coreV1.PodSpec{
+					HostPID:                       true,
 					TerminationGracePeriodSeconds: &termination,
 					NodeName:                      nodeName,
 					Volumes: []coreV1.Volume{
@@ -195,7 +192,7 @@ func containerKillJob(chaosJobName string, step v1alpha1.ChaosStep, generation i
 							Resources:       coreV1.ResourceRequirements{},
 							ImagePullPolicy: coreV1.PullAlways,
 							SecurityContext: &coreV1.SecurityContext{
-								Privileged: &privileged,
+								Privileged: utils.PtrData(true),
 							},
 						},
 					},

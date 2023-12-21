@@ -35,12 +35,7 @@ import (
 )
 
 func podStressJob(chaosJobName string, step v1alpha1.ChaosStep, generation int64, nodeName, podName string) batchV1.Job {
-	var (
-		backOffLimit int32 = 0
-		envs         []coreV1.EnvVar
-		privileged         = true
-		user         int64 = 0
-	)
+	var envs []coreV1.EnvVar
 	termination, _ := strconv.ParseInt(step.Config["TERMINATION_GRACE_PERIOD_SECONDS"], 10, 64)
 	jobName := fmt.Sprintf("%s-%s", step.Name, utils.RandomString(10))
 
@@ -64,7 +59,7 @@ func podStressJob(chaosJobName string, step v1alpha1.ChaosStep, generation int64
 			},
 		},
 		Spec: batchV1.JobSpec{
-			BackoffLimit: &backOffLimit,
+			BackoffLimit: utils.PtrData(int32(0)),
 			Template: coreV1.PodTemplateSpec{
 				ObjectMeta: metaV1.ObjectMeta{
 					Labels: map[string]string{
@@ -118,8 +113,8 @@ func podStressJob(chaosJobName string, step v1alpha1.ChaosStep, generation int64
 							Resources:       coreV1.ResourceRequirements{},
 							ImagePullPolicy: coreV1.PullAlways,
 							SecurityContext: &coreV1.SecurityContext{
-								Privileged: &privileged,
-								RunAsUser:  &user,
+								Privileged: utils.PtrData(true),
+								RunAsUser:  utils.PtrData(int64(0)),
 								Capabilities: &coreV1.Capabilities{
 									Add: []coreV1.Capability{
 										"SYS_ADMIN",

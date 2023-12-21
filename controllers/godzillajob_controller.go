@@ -103,12 +103,12 @@ func (r *GodzillaJobReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 func (r *GodzillaJobReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&v1alpha1.GodzillaJob{}).
-		WithEventFilter(ignoreDeletionPredicate()).
+		WithEventFilter(ignorePredicate()).
 		WithOptions(controller.Options{MaxConcurrentReconciles: 5}).
 		Complete(r)
 }
 
-func ignoreDeletionPredicate() predicate.Predicate {
+func ignorePredicate() predicate.Predicate {
 	return predicate.Funcs{
 		UpdateFunc: func(e event.UpdateEvent) bool {
 			return e.ObjectOld.GetGeneration() != e.ObjectNew.GetGeneration()
