@@ -21,7 +21,6 @@ import (
 	"fmt"
 	"github.com/kbfu/godzilla-operator/api/v1alpha1"
 	"github.com/kbfu/godzilla-operator/controllers/chaos"
-	"github.com/kbfu/godzilla-operator/controllers/chaos/litmus"
 	"github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -88,7 +87,7 @@ func (r *GodzillaJobReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 				s := s
 				go func() {
 					logrus.Infof("running job %s", job.Name)
-					litmus.Run(job.Name, s, job.ObjectMeta.Generation)
+					chaos.Run(job.Name, s, job.ObjectMeta.Generation)
 					wg.Done()
 				}()
 			}

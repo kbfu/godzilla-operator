@@ -37,19 +37,23 @@ const (
 	UnknownStatus JobStatus = "unknown"
 )
 
-type LitmusType string
+type (
+	LitmusType   string
+	GodzillaType string
+)
 
 const (
-	LitmusPodDelete       LitmusType = "litmus-pod-delete"
-	LitmusPodIoStress     LitmusType = "litmus-pod-io-stress"
-	LitmusContainerKill   LitmusType = "litmus-container-kill"
-	LitmusPodMemoryStress LitmusType = "litmus-pod-memory-stress"
-	LitmusPodCpuStress    LitmusType = "litmus-pod-cpu-stress"
+	LitmusPodDelete         LitmusType   = "litmus-pod-delete"
+	LitmusPodIoStress       LitmusType   = "litmus-pod-io-stress"
+	LitmusContainerKill     LitmusType   = "litmus-container-kill"
+	LitmusPodMemoryStress   LitmusType   = "litmus-pod-memory-stress"
+	LitmusPodCpuStress      LitmusType   = "litmus-pod-cpu-stress"
+	GodzillaPodNetworkDelay GodzillaType = "godzilla-pod-network-delay"
 )
 
 type ChaosStep struct {
 	Name               string            `json:"name"`
-	Type               LitmusType        `json:"type"`
+	Type               string            `json:"type"`
 	Config             map[string]string `json:"config"`
 	Image              string            `json:"image,omitempty"`
 	ServiceAccountName string            `json:"serviceAccountName,omitempty"`

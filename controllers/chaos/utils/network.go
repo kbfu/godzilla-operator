@@ -16,22 +16,22 @@
  * /
  */
 
-package litmus
+package utils
 
 import (
-	"github.com/kbfu/godzilla-operator/api/v1alpha1"
-	"github.com/sirupsen/logrus"
+	"net"
 )
 
-func Run(jobName string, step v1alpha1.ChaosStep, generation int64) {
-	switch step.Type {
-	case v1alpha1.LitmusPodDelete:
-		runPodKill(jobName, step, generation)
-	case v1alpha1.LitmusPodIoStress, v1alpha1.LitmusPodMemoryStress, v1alpha1.LitmusPodCpuStress:
-		runPodStress(jobName, step, generation)
-	case v1alpha1.LitmusContainerKill:
-		runContainerKill(jobName, step, generation)
-	default:
-		logrus.Errorf("%s type not found", step.Type)
+func LookUpHost(hostname string) (ipv4Addr string, err error) {
+	ips, err := net.LookupIP(hostname)
+	if err != nil {
+		return
 	}
+	for _, i := range ips {
+		if i.To4() != nil {
+			ipv4Addr = string(i.To4())
+			break
+		}
+	}
+	return
 }

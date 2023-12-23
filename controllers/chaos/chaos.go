@@ -23,7 +23,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/kbfu/godzilla-operator/api/v1alpha1"
-	"github.com/kbfu/godzilla-operator/controllers/chaos/litmus/pod"
+	"github.com/kbfu/godzilla-operator/controllers/chaos/pod"
 	"github.com/kbfu/godzilla-operator/controllers/env"
 	"github.com/sirupsen/logrus"
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -68,8 +68,8 @@ func PreCheck(job v1alpha1.GodzillaJob) error {
 				return errors.New(msg)
 			}
 			switch j.Type {
-			case v1alpha1.LitmusPodDelete, v1alpha1.LitmusPodIoStress, v1alpha1.LitmusContainerKill,
-				v1alpha1.LitmusPodCpuStress, v1alpha1.LitmusPodMemoryStress:
+			case string(v1alpha1.LitmusPodDelete), string(v1alpha1.LitmusPodIoStress), string(v1alpha1.LitmusContainerKill),
+				string(v1alpha1.LitmusPodCpuStress), string(v1alpha1.LitmusPodMemoryStress), string(v1alpha1.GodzillaPodNetworkDelay):
 			default:
 				msg := fmt.Sprintf("unsupported type %s", j.Type)
 				err := UpdateJobStatus(fmt.Sprintf("%s-%v", job.Name, job.Generation),

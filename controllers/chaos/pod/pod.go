@@ -47,9 +47,11 @@ var (
 	podMemoryStress []byte
 	//go:embed pod-cpu-stress.yaml
 	podCpuStress []byte
+	//go:embed pod-network-delay.yaml
+	podNetworkDelay []byte
 )
 
-func PopulateDefault(chaosType godzillachaosiov1alpha1.LitmusType) (config PodConfig) {
+func PopulateDefault(chaosType string) (config PodConfig) {
 	var (
 		commonConfig PodConfig
 		typeConfig   PodConfig
@@ -59,30 +61,35 @@ func PopulateDefault(chaosType godzillachaosiov1alpha1.LitmusType) (config PodCo
 		logrus.Fatalf("unmarshal default pod common yaml file failed, reason: %s", err.Error())
 	}
 	switch chaosType {
-	case godzillachaosiov1alpha1.LitmusPodDelete:
+	case string(godzillachaosiov1alpha1.LitmusPodDelete):
 		err = yaml.Unmarshal(deletePod, &typeConfig)
 		if err != nil {
 			logrus.Fatalf("unmarshal pod delete yaml file failed, reason: %s", err.Error())
 		}
-	case godzillachaosiov1alpha1.LitmusPodIoStress:
+	case string(godzillachaosiov1alpha1.LitmusPodIoStress):
 		err = yaml.Unmarshal(podIoStress, &typeConfig)
 		if err != nil {
 			logrus.Fatalf("unmarshal pod io stress yaml file failed, reason: %s", err.Error())
 		}
-	case godzillachaosiov1alpha1.LitmusContainerKill:
+	case string(godzillachaosiov1alpha1.LitmusContainerKill):
 		err = yaml.Unmarshal(containerKill, &typeConfig)
 		if err != nil {
 			logrus.Fatalf("unmarshal pod container kill yaml file failed, reason: %s", err.Error())
 		}
-	case godzillachaosiov1alpha1.LitmusPodMemoryStress:
+	case string(godzillachaosiov1alpha1.LitmusPodMemoryStress):
 		err = yaml.Unmarshal(podMemoryStress, &typeConfig)
 		if err != nil {
 			logrus.Fatalf("unmarshal pod memory stress yaml file failed, reason: %s", err.Error())
 		}
-	case godzillachaosiov1alpha1.LitmusPodCpuStress:
+	case string(godzillachaosiov1alpha1.LitmusPodCpuStress):
 		err = yaml.Unmarshal(podCpuStress, &typeConfig)
 		if err != nil {
 			logrus.Fatalf("unmarshal pod cpu stress yaml file failed, reason: %s", err.Error())
+		}
+	case string(godzillachaosiov1alpha1.GodzillaPodNetworkDelay):
+		err = yaml.Unmarshal(podNetworkDelay, &typeConfig)
+		if err != nil {
+			logrus.Fatalf("unmarshal pod network delay yaml file failed, reason: %s", err.Error())
 		}
 	}
 	config = commonConfig

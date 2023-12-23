@@ -16,14 +16,13 @@
  * /
  */
 
-package litmus
+package chaos
 
 import (
 	"context"
 	"fmt"
 	"github.com/kbfu/godzilla-operator/api/v1alpha1"
-	"github.com/kbfu/godzilla-operator/controllers/chaos"
-	"github.com/kbfu/godzilla-operator/controllers/chaos/litmus/utils"
+	"github.com/kbfu/godzilla-operator/controllers/chaos/utils"
 	"github.com/kbfu/godzilla-operator/controllers/env"
 	"github.com/sirupsen/logrus"
 	batchV1 "k8s.io/api/batch/v1"
@@ -41,8 +40,8 @@ func runContainerKill(chaosJobName string, step v1alpha1.ChaosStep, generation i
 	logrus.Infof("creating step %s", step.Name)
 	pods, err := utils.FilterTargetPods(step.Config)
 	if err != nil {
-		chaos.UpdateSnapshot(chaosJobName, step.Name, err.Error(), generation, v1alpha1.FailedStatus)
-		chaos.UpdateJobStatus(fmt.Sprintf("%s-%v", chaosJobName, generation), "", v1alpha1.FailedStatus)
+		UpdateSnapshot(chaosJobName, step.Name, err.Error(), generation, v1alpha1.FailedStatus)
+		UpdateJobStatus(fmt.Sprintf("%s-%v", chaosJobName, generation), "", v1alpha1.FailedStatus)
 		return
 	}
 	for i := range pods {
@@ -52,25 +51,25 @@ func runContainerKill(chaosJobName string, step v1alpha1.ChaosStep, generation i
 		}
 		step.Config["APP_POD"] = pods[i].Name
 		job := containerKillJob(chaosJobName, step, generation, pods[i].Spec.NodeName, pods[i].Name)
-		_, err := chaos.KubeClient.BatchV1().Jobs(env.JobNamespace).Create(context.TODO(), &job, metaV1.CreateOptions{})
+		_, err := KubeClient.BatchV1().Jobs(env.JobNamespace).Create(context.TODO(), &job, metaV1.CreateOptions{})
 		if err != nil {
 			// update status
-			chaos.UpdateSnapshot(chaosJobName, step.Name, err.Error(), generation, v1alpha1.FailedStatus)
-			chaos.UpdateJobStatus(fmt.Sprintf("%s-%v", chaosJobName, generation), "", v1alpha1.FailedStatus)
+			UpdateSnapshot(chaosJobName, step.Name, err.Error(), generation, v1alpha1.FailedStatus)
+			UpdateJobStatus(fmt.Sprintf("%s-%v", chaosJobName, generation), "", v1alpha1.FailedStatus)
 			return
 		}
 	}
 	logrus.Infof("pods for step %s created", step.Name)
 
 	// watch for the status
-	w, err := chaos.KubeClient.CoreV1().Pods(env.JobNamespace).Watch(context.TODO(), metaV1.ListOptions{
+	w, err := KubeClient.CoreV1().Pods(env.JobNamespace).Watch(context.TODO(), metaV1.ListOptions{
 		LabelSelector: fmt.Sprintf("chaos.job.generation=%v,chaos.step.name=%s,chaos.job.name=%s", generation, step.Name, chaosJobName),
 	})
 	if err != nil {
 		logrus.Errorf("step %s status watch failed, reason: %s", step.Name, err.Error())
 		// update status
-		chaos.UpdateSnapshot(chaosJobName, step.Name, err.Error(), generation, v1alpha1.FailedStatus)
-		chaos.UpdateJobStatus(fmt.Sprintf("%s-%v", chaosJobName, generation), "", v1alpha1.FailedStatus)
+		UpdateSnapshot(chaosJobName, step.Name, err.Error(), generation, v1alpha1.FailedStatus)
+		UpdateJobStatus(fmt.Sprintf("%s-%v", chaosJobName, generation), "", v1alpha1.FailedStatus)
 		return
 	}
 	logrus.Infof("watching for step %s", step.Name)
@@ -81,12 +80,12 @@ func runContainerKill(chaosJobName string, step v1alpha1.ChaosStep, generation i
 				if podObject.Status.Phase == coreV1.PodSucceeded || podObject.Status.Phase == coreV1.PodFailed {
 					// cleanup
 					logrus.Infof("step %s finished, starting cleanup", step.Name)
-					err = chaos.CleanJob(chaosJobName, step, generation)
+					err = CleanJob(chaosJobName, step, generation)
 					if err != nil {
 						logrus.Errorf("step %s cleanup failed, reason: %s", step.Name, err.Error())
 						// update status
-						chaos.UpdateSnapshot(chaosJobName, step.Name, err.Error(), generation, v1alpha1.FailedStatus)
-						chaos.UpdateJobStatus(fmt.Sprintf("%s-%v", chaosJobName, generation), "", v1alpha1.FailedStatus)
+						UpdateSnapshot(chaosJobName, step.Name, err.Error(), generation, v1alpha1.FailedStatus)
+						UpdateJobStatus(fmt.Sprintf("%s-%v", chaosJobName, generation), "", v1alpha1.FailedStatus)
 						w.Stop()
 						return
 					}
@@ -94,16 +93,16 @@ func runContainerKill(chaosJobName string, step v1alpha1.ChaosStep, generation i
 					switch podObject.Status.Phase {
 					case coreV1.PodSucceeded:
 						// update status
-						chaos.UpdateSnapshot(chaosJobName, step.Name, "", generation, v1alpha1.SuccessStatus)
+						UpdateSnapshot(chaosJobName, step.Name, "", generation, v1alpha1.SuccessStatus)
 					case coreV1.PodFailed:
 						// update status
-						chaos.UpdateSnapshot(chaosJobName, step.Name, "chaos step pod running failed", generation,
+						UpdateSnapshot(chaosJobName, step.Name, "chaos step pod running failed", generation,
 							v1alpha1.FailedStatus)
-						chaos.UpdateJobStatus(fmt.Sprintf("%s-%v", chaosJobName, generation), "", v1alpha1.FailedStatus)
+						UpdateJobStatus(fmt.Sprintf("%s-%v", chaosJobName, generation), "", v1alpha1.FailedStatus)
 					default:
 						// update status
-						chaos.UpdateSnapshot(chaosJobName, step.Name, "", generation, v1alpha1.UnknownStatus)
-						chaos.UpdateJobStatus(fmt.Sprintf("%s-%v", chaosJobName, generation), "", v1alpha1.UnknownStatus)
+						UpdateSnapshot(chaosJobName, step.Name, "", generation, v1alpha1.UnknownStatus)
+						UpdateJobStatus(fmt.Sprintf("%s-%v", chaosJobName, generation), "", v1alpha1.UnknownStatus)
 					}
 					w.Stop()
 					break
@@ -111,10 +110,10 @@ func runContainerKill(chaosJobName string, step v1alpha1.ChaosStep, generation i
 					// timeout, mark to failed status
 					if elapsed+120 < int(time.Now().Unix()) {
 						// update status
-						chaos.UpdateSnapshot(chaosJobName, step.Name, "chaos step pod not started", generation, v1alpha1.FailedStatus)
-						chaos.UpdateJobStatus(fmt.Sprintf("%s-%v", chaosJobName, generation), "", v1alpha1.FailedStatus)
+						UpdateSnapshot(chaosJobName, step.Name, "chaos step pod not started", generation, v1alpha1.FailedStatus)
+						UpdateJobStatus(fmt.Sprintf("%s-%v", chaosJobName, generation), "", v1alpha1.FailedStatus)
 						logrus.Infof("step %s failed, starting cleanup", step.Name)
-						chaos.CleanJob(chaosJobName, step, generation)
+						CleanJob(chaosJobName, step, generation)
 						w.Stop()
 						break
 					}

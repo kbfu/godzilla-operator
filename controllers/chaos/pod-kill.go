@@ -16,13 +16,12 @@
  * /
  */
 
-package litmus
+package chaos
 
 import (
 	"context"
 	"fmt"
 	"github.com/kbfu/godzilla-operator/api/v1alpha1"
-	"github.com/kbfu/godzilla-operator/controllers/chaos"
 	"github.com/kbfu/godzilla-operator/controllers/env"
 	"github.com/sirupsen/logrus"
 	batchV1 "k8s.io/api/batch/v1"
@@ -98,27 +97,27 @@ func runPodKill(chaosJobName string, step v1alpha1.ChaosStep, generation int64) 
 	start := time.Now().Unix()
 	duration, _ := strconv.Atoi(step.Config["TOTAL_CHAOS_DURATION"])
 	elapsed := int(start) + duration
-	_, err := chaos.KubeClient.BatchV1().Jobs(env.JobNamespace).Create(context.TODO(), &job, metaV1.CreateOptions{})
+	_, err := KubeClient.BatchV1().Jobs(env.JobNamespace).Create(context.TODO(), &job, metaV1.CreateOptions{})
 	if err != nil {
 		logrus.Errorf("step %s run failed, reason: %s", step.Name, err.Error())
 		// update status
-		chaos.UpdateSnapshot(chaosJobName, step.Name, err.Error(), generation, v1alpha1.FailedStatus)
-		chaos.UpdateJobStatus(chaosJobName, "", v1alpha1.FailedStatus)
+		UpdateSnapshot(chaosJobName, step.Name, err.Error(), generation, v1alpha1.FailedStatus)
+		UpdateJobStatus(chaosJobName, "", v1alpha1.FailedStatus)
 		return
 	}
 	logrus.Infof("step %s created", step.Name)
 	// status started
 	// update status
-	chaos.UpdateSnapshot(chaosJobName, step.Name, "", generation, v1alpha1.RunningStatus)
+	UpdateSnapshot(chaosJobName, step.Name, "", generation, v1alpha1.RunningStatus)
 	// watch for the status
-	w, err := chaos.KubeClient.CoreV1().Pods(env.JobNamespace).Watch(context.TODO(), metaV1.ListOptions{
+	w, err := KubeClient.CoreV1().Pods(env.JobNamespace).Watch(context.TODO(), metaV1.ListOptions{
 		LabelSelector: fmt.Sprintf("chaos.job.generation=%v,chaos.step.name=%s,chaos.job.name=%s", generation, step.Name, chaosJobName),
 	})
 	if err != nil {
 		logrus.Errorf("step %s status watch failed, reason: %s", step.Name, err.Error())
 		// update status
-		chaos.UpdateSnapshot(chaosJobName, step.Name, err.Error(), generation, v1alpha1.FailedStatus)
-		chaos.UpdateJobStatus(chaosJobName, "", v1alpha1.FailedStatus)
+		UpdateSnapshot(chaosJobName, step.Name, err.Error(), generation, v1alpha1.FailedStatus)
+		UpdateJobStatus(chaosJobName, "", v1alpha1.FailedStatus)
 		return
 	}
 	logrus.Infof("watching for step %s", step.Name)
@@ -129,12 +128,12 @@ func runPodKill(chaosJobName string, step v1alpha1.ChaosStep, generation int64) 
 				if podObject.Status.Phase == coreV1.PodSucceeded || podObject.Status.Phase == coreV1.PodFailed {
 					// cleanup
 					logrus.Infof("step %s finished, starting cleanup", step.Name)
-					err = chaos.CleanJob(chaosJobName, step, generation)
+					err = CleanJob(chaosJobName, step, generation)
 					if err != nil {
 						logrus.Errorf("step %s cleanup failed, reason: %s", step.Name, err.Error())
 						// update status
-						chaos.UpdateSnapshot(chaosJobName, step.Name, err.Error(), generation, v1alpha1.FailedStatus)
-						chaos.UpdateJobStatus(chaosJobName, "", v1alpha1.FailedStatus)
+						UpdateSnapshot(chaosJobName, step.Name, err.Error(), generation, v1alpha1.FailedStatus)
+						UpdateJobStatus(chaosJobName, "", v1alpha1.FailedStatus)
 						w.Stop()
 						return
 					}
@@ -142,16 +141,16 @@ func runPodKill(chaosJobName string, step v1alpha1.ChaosStep, generation int64) 
 					switch podObject.Status.Phase {
 					case coreV1.PodSucceeded:
 						// update status
-						chaos.UpdateSnapshot(chaosJobName, step.Name, "", generation, v1alpha1.SuccessStatus)
+						UpdateSnapshot(chaosJobName, step.Name, "", generation, v1alpha1.SuccessStatus)
 					case coreV1.PodFailed:
 						// update status
-						chaos.UpdateSnapshot(chaosJobName, step.Name, "chaos step pod running failed", generation,
+						UpdateSnapshot(chaosJobName, step.Name, "chaos step pod running failed", generation,
 							v1alpha1.FailedStatus)
-						chaos.UpdateJobStatus(chaosJobName, "", v1alpha1.FailedStatus)
+						UpdateJobStatus(chaosJobName, "", v1alpha1.FailedStatus)
 					default:
 						// update status
-						chaos.UpdateSnapshot(chaosJobName, step.Name, "", generation, v1alpha1.UnknownStatus)
-						chaos.UpdateJobStatus(chaosJobName, "", v1alpha1.UnknownStatus)
+						UpdateSnapshot(chaosJobName, step.Name, "", generation, v1alpha1.UnknownStatus)
+						UpdateJobStatus(chaosJobName, "", v1alpha1.UnknownStatus)
 					}
 					w.Stop()
 					break
@@ -159,10 +158,10 @@ func runPodKill(chaosJobName string, step v1alpha1.ChaosStep, generation int64) 
 					// timeout, mark to failed status
 					if elapsed+120 < int(time.Now().Unix()) {
 						// update status
-						chaos.UpdateSnapshot(chaosJobName, step.Name, "chaos step pod not started", generation, v1alpha1.FailedStatus)
-						chaos.UpdateJobStatus(chaosJobName, "", v1alpha1.FailedStatus)
+						UpdateSnapshot(chaosJobName, step.Name, "chaos step pod not started", generation, v1alpha1.FailedStatus)
+						UpdateJobStatus(chaosJobName, "", v1alpha1.FailedStatus)
 						logrus.Infof("step %s failed, starting cleanup", step.Name)
-						chaos.CleanJob(chaosJobName, step, generation)
+						CleanJob(chaosJobName, step, generation)
 						w.Stop()
 						break
 					}
