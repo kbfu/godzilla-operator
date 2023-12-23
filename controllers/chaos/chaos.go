@@ -88,14 +88,14 @@ func CleanJob(chaosJobName string, step v1alpha1.ChaosStep, generation int64) er
 	logrus.Infof("cleaning up the chaos job %s", step.Name)
 	policy := metaV1.DeletePropagationForeground
 	// get name
-	jobList, err := KubeClient.BatchV1().Jobs(env.JobNamespace).List(context.TODO(), metaV1.ListOptions{
+	jobList, err := env.KubeClient.BatchV1().Jobs(env.JobNamespace).List(context.TODO(), metaV1.ListOptions{
 		LabelSelector: fmt.Sprintf("chaos.job.generation=%v,chaos.step.name=%s,chaos.job.name=%s", generation, step.Name, chaosJobName),
 	})
 	if err != nil {
 		return err
 	}
 	for _, j := range jobList.Items {
-		err := KubeClient.BatchV1().Jobs(env.JobNamespace).Delete(context.TODO(), j.Name, metaV1.DeleteOptions{
+		err := env.KubeClient.BatchV1().Jobs(env.JobNamespace).Delete(context.TODO(), j.Name, metaV1.DeleteOptions{
 			PropagationPolicy: &policy,
 		})
 		if err != nil {

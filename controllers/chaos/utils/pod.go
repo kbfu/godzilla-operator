@@ -21,7 +21,7 @@ package utils
 import (
 	"context"
 	"errors"
-	"github.com/kbfu/godzilla-operator/controllers/chaos"
+	"github.com/kbfu/godzilla-operator/controllers/env"
 	"github.com/sirupsen/logrus"
 	coreV1 "k8s.io/api/core/v1"
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -46,7 +46,7 @@ func FilterTargetPods(config map[string]string) (pods []coreV1.Pod, err error) {
 		for _, targetPod := range targetPods {
 			targetPod = strings.TrimSpace(targetPod)
 			var podObject *coreV1.Pod
-			podObject, err = chaos.KubeClient.CoreV1().Pods(config["APP_NAMESPACE"]).Get(context.TODO(), targetPod, metaV1.GetOptions{})
+			podObject, err = env.KubeClient.CoreV1().Pods(config["APP_NAMESPACE"]).Get(context.TODO(), targetPod, metaV1.GetOptions{})
 			if err != nil {
 				return
 			}
@@ -55,7 +55,7 @@ func FilterTargetPods(config map[string]string) (pods []coreV1.Pod, err error) {
 	} else {
 		// check label
 		var podList *coreV1.PodList
-		podList, err = chaos.KubeClient.CoreV1().Pods(config["APP_NAMESPACE"]).List(context.TODO(), metaV1.ListOptions{
+		podList, err = env.KubeClient.CoreV1().Pods(config["APP_NAMESPACE"]).List(context.TODO(), metaV1.ListOptions{
 			LabelSelector: config["APP_LABEL"],
 			FieldSelector: "status.phase=Running",
 		})

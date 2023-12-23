@@ -22,7 +22,6 @@ import (
 	"path"
 	"strconv"
 
-	"github.com/kbfu/godzilla-operator/controllers/chaos"
 	"github.com/kbfu/godzilla-operator/controllers/env"
 
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
@@ -64,7 +63,7 @@ func init() {
 	logrus.SetFormatter(customFormatter)
 	logrus.SetReportCaller(true)
 	env.ParseVars()
-	chaos.InitKubeClient(scheme)
+	env.InitKubeClient(scheme)
 }
 
 func main() {

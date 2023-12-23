@@ -97,7 +97,7 @@ func runPodKill(chaosJobName string, step v1alpha1.ChaosStep, generation int64) 
 	start := time.Now().Unix()
 	duration, _ := strconv.Atoi(step.Config["TOTAL_CHAOS_DURATION"])
 	elapsed := int(start) + duration
-	_, err := KubeClient.BatchV1().Jobs(env.JobNamespace).Create(context.TODO(), &job, metaV1.CreateOptions{})
+	_, err := env.KubeClient.BatchV1().Jobs(env.JobNamespace).Create(context.TODO(), &job, metaV1.CreateOptions{})
 	if err != nil {
 		logrus.Errorf("step %s run failed, reason: %s", step.Name, err.Error())
 		// update status
@@ -110,7 +110,7 @@ func runPodKill(chaosJobName string, step v1alpha1.ChaosStep, generation int64) 
 	// update status
 	UpdateSnapshot(chaosJobName, step.Name, "", generation, v1alpha1.RunningStatus)
 	// watch for the status
-	w, err := KubeClient.CoreV1().Pods(env.JobNamespace).Watch(context.TODO(), metaV1.ListOptions{
+	w, err := env.KubeClient.CoreV1().Pods(env.JobNamespace).Watch(context.TODO(), metaV1.ListOptions{
 		LabelSelector: fmt.Sprintf("chaos.job.generation=%v,chaos.step.name=%s,chaos.job.name=%s", generation, step.Name, chaosJobName),
 	})
 	if err != nil {

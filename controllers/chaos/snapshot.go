@@ -70,13 +70,13 @@ func InitSnapshot(job v1alpha1.GodzillaJob) error {
 		nestedSteps = append(nestedSteps, steps)
 	}
 	snapshot.Spec.Steps = nestedSteps
-	err := Client.Create(context.TODO(), &snapshot)
+	err := env.Client.Create(context.TODO(), &snapshot)
 	if err != nil {
 		logrus.Error(err)
 		return err
 	}
 	snapshot.Status.JobStatus = v1alpha1.PendingStatus
-	err = Client.Status().Update(context.TODO(), &snapshot)
+	err = env.Client.Status().Update(context.TODO(), &snapshot)
 	if err != nil {
 		logrus.Error(err)
 		return err
@@ -86,7 +86,7 @@ func InitSnapshot(job v1alpha1.GodzillaJob) error {
 
 func UpdateJobStatus(name, reason string, jobStatus v1alpha1.JobStatus) error {
 	var snapshot v1alpha1.GodzillaJobSnapshot
-	err := Client.Get(context.TODO(), client.ObjectKey{
+	err := env.Client.Get(context.TODO(), client.ObjectKey{
 		Namespace: env.JobNamespace,
 		Name:      name,
 	}, &snapshot)
@@ -97,7 +97,7 @@ func UpdateJobStatus(name, reason string, jobStatus v1alpha1.JobStatus) error {
 	if statusCheck(snapshot.Status.JobStatus, jobStatus) {
 		snapshot.Status.JobStatus = jobStatus
 		snapshot.Status.FailedReason = reason
-		err = Client.Status().Update(context.TODO(), &snapshot)
+		err = env.Client.Status().Update(context.TODO(), &snapshot)
 		if err != nil {
 			logrus.Error(err)
 			return err
@@ -109,7 +109,7 @@ func UpdateJobStatus(name, reason string, jobStatus v1alpha1.JobStatus) error {
 func UpdateSnapshot(jobName, stepName, reason string, generation int64, stepStatus v1alpha1.JobStatus) error {
 	name := fmt.Sprintf("%s-%v", jobName, generation)
 	var snapshot v1alpha1.GodzillaJobSnapshot
-	err := Client.Get(context.TODO(), client.ObjectKey{
+	err := env.Client.Get(context.TODO(), client.ObjectKey{
 		Namespace: env.JobNamespace,
 		Name:      name,
 	}, &snapshot)
@@ -130,7 +130,7 @@ out:
 			}
 		}
 	}
-	err = Client.Update(context.TODO(), &snapshot)
+	err = env.Client.Update(context.TODO(), &snapshot)
 	if err != nil {
 		logrus.Error(err)
 		return err

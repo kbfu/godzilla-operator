@@ -51,7 +51,7 @@ func runContainerKill(chaosJobName string, step v1alpha1.ChaosStep, generation i
 		}
 		step.Config["APP_POD"] = pods[i].Name
 		job := containerKillJob(chaosJobName, step, generation, pods[i].Spec.NodeName, pods[i].Name)
-		_, err := KubeClient.BatchV1().Jobs(env.JobNamespace).Create(context.TODO(), &job, metaV1.CreateOptions{})
+		_, err := env.KubeClient.BatchV1().Jobs(env.JobNamespace).Create(context.TODO(), &job, metaV1.CreateOptions{})
 		if err != nil {
 			// update status
 			UpdateSnapshot(chaosJobName, step.Name, err.Error(), generation, v1alpha1.FailedStatus)
@@ -62,7 +62,7 @@ func runContainerKill(chaosJobName string, step v1alpha1.ChaosStep, generation i
 	logrus.Infof("pods for step %s created", step.Name)
 
 	// watch for the status
-	w, err := KubeClient.CoreV1().Pods(env.JobNamespace).Watch(context.TODO(), metaV1.ListOptions{
+	w, err := env.KubeClient.CoreV1().Pods(env.JobNamespace).Watch(context.TODO(), metaV1.ListOptions{
 		LabelSelector: fmt.Sprintf("chaos.job.generation=%v,chaos.step.name=%s,chaos.job.name=%s", generation, step.Name, chaosJobName),
 	})
 	if err != nil {

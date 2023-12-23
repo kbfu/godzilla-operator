@@ -22,7 +22,7 @@ import (
 
 type ChaosStepSnapshot struct {
 	Name               string            `json:"name"`
-	Type               LitmusType        `json:"type"`
+	Type               string            `json:"type"`
 	Config             map[string]string `json:"config"`
 	Image              string            `json:"image,omitempty"`
 	ServiceAccountName string            `json:"serviceAccountName"`
