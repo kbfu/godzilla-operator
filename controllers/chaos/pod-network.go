@@ -149,18 +149,22 @@ func runNetworkChaos(chaosJobName string, step v1alpha1.ChaosStep, generation in
 		}
 		// lookup hosts here
 		if step.Config["DESTINATION_HOSTS"] != "" {
-			for _, hostname := range strings.Split(step.Config["DESTINATION_HOSTS"], "") {
+			for _, hostname := range strings.Split(step.Config["DESTINATION_HOSTS"], ",") {
 				hostname = strings.TrimSpace(hostname)
-				ipv4Addr, err := utils.LookUpHost(hostname)
+				addrs, err := utils.LookUpHost(hostname)
 				if err != nil {
 					UpdateSnapshot(chaosJobName, step.Name, err.Error(), generation, v1alpha1.FailedStatus)
 					UpdateJobStatus(fmt.Sprintf("%s-%v", chaosJobName, generation), err.Error(), v1alpha1.FailedStatus)
 					return
 				}
 				if step.Config["DESTINATION_IPS"] == "" {
-					step.Config["DESTINATION_IPS"] += ipv4Addr
+					for _, addr := range addrs {
+						step.Config["DESTINATION_IPS"] += addr
+					}
 				} else {
-					step.Config["DESTINATION_IPS"] += fmt.Sprintf(",%s", ipv4Addr)
+					for _, addr := range addrs {
+						step.Config["DESTINATION_IPS"] += fmt.Sprintf(",%s", addr)
+					}
 				}
 			}
 		}

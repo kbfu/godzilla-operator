@@ -22,15 +22,14 @@ import (
 	"net"
 )
 
-func LookUpHost(hostname string) (ipv4Addr string, err error) {
-	ips, err := net.LookupIP(hostname)
+func LookUpHost(hostname string) (addrs []string, err error) {
+	ips, err := net.LookupHost(hostname)
 	if err != nil {
 		return
 	}
-	for _, i := range ips {
-		if i.To4() != nil {
-			ipv4Addr = string(i.To4())
-			break
+	for _, ip := range ips {
+		if net.ParseIP(ip).To4() != nil {
+			addrs = append(addrs, ip)
 		}
 	}
 	return

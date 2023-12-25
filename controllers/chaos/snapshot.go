@@ -107,6 +107,9 @@ func UpdateJobStatus(name, reason string, jobStatus v1alpha1.JobStatus) error {
 }
 
 func UpdateSnapshot(jobName, stepName, reason string, generation int64, stepStatus v1alpha1.JobStatus) error {
+	if stepStatus == v1alpha1.FailedStatus {
+		logrus.Errorf("job %s, step %s, failed reason %s", jobName, stepName, reason)
+	}
 	name := fmt.Sprintf("%s-%v", jobName, generation)
 	var snapshot v1alpha1.GodzillaJobSnapshot
 	err := env.Client.Get(context.TODO(), client.ObjectKey{
