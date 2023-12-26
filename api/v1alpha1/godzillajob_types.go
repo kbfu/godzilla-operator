@@ -50,6 +50,9 @@ const (
 	LitmusPodCpuStress           LitmusType   = "litmus-pod-cpu-stress"
 	GodzillaPodNetworkDelay      GodzillaType = "godzilla-pod-network-delay"
 	GodzillaPodNetworkCorruption GodzillaType = "godzilla-pod-network-corruption"
+	GodzillaPodNetworkLoss       GodzillaType = "godzilla-pod-network-loss"
+	GodzillaPodNetworkDuplicate  GodzillaType = "godzilla-pod-network-duplicate"
+	GodzillaPodNetworkReorder    GodzillaType = "godzilla-pod-network-reorder"
 )
 
 type ChaosStep struct {

@@ -11,7 +11,7 @@ metadata:
   namespace: godzilla-operator-system
 spec:
   steps:
-    - - type: godzilla-pod-network-delay
+    - - type: godzilla-pod-network-corruption
         name: test
         config:
           TOTAL_CHAOS_DURATION: '120'

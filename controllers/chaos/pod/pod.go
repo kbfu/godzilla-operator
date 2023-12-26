@@ -51,6 +51,12 @@ var (
 	podNetworkDelay []byte
 	//go:embed pod-network-corruption.yaml
 	podNetworkCorruption []byte
+	//go:embed pod-network-loss.yaml
+	podNetworkLoss []byte
+	//go:embed pod-network-dup.yaml
+	podNetworkDup []byte
+	//go:embed pod-network-reorder.yaml
+	podNetworkReorder []byte
 )
 
 func PopulateDefault(chaosType string) (config PodConfig) {
@@ -97,6 +103,21 @@ func PopulateDefault(chaosType string) (config PodConfig) {
 		err = yaml.Unmarshal(podNetworkCorruption, &typeConfig)
 		if err != nil {
 			logrus.Fatalf("unmarshal pod network corruption yaml file failed, reason: %s", err.Error())
+		}
+	case string(godzillachaosiov1alpha1.GodzillaPodNetworkLoss):
+		err = yaml.Unmarshal(podNetworkLoss, &typeConfig)
+		if err != nil {
+			logrus.Fatalf("unmarshal pod network loss yaml file failed, reason: %s", err.Error())
+		}
+	case string(godzillachaosiov1alpha1.GodzillaPodNetworkDuplicate):
+		err = yaml.Unmarshal(podNetworkDup, &typeConfig)
+		if err != nil {
+			logrus.Fatalf("unmarshal pod network duplicate yaml file failed, reason: %s", err.Error())
+		}
+	case string(godzillachaosiov1alpha1.GodzillaPodNetworkReorder):
+		err = yaml.Unmarshal(podNetworkReorder, &typeConfig)
+		if err != nil {
+			logrus.Fatalf("unmarshal pod network reorder yaml file failed, reason: %s", err.Error())
 		}
 	}
 	config = commonConfig
