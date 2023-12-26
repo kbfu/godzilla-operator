@@ -43,12 +43,13 @@ type (
 )
 
 const (
-	LitmusPodDelete         LitmusType   = "litmus-pod-delete"
-	LitmusPodIoStress       LitmusType   = "litmus-pod-io-stress"
-	LitmusContainerKill     LitmusType   = "litmus-container-kill"
-	LitmusPodMemoryStress   LitmusType   = "litmus-pod-memory-stress"
-	LitmusPodCpuStress      LitmusType   = "litmus-pod-cpu-stress"
-	GodzillaPodNetworkDelay GodzillaType = "godzilla-pod-network-delay"
+	LitmusPodDelete              LitmusType   = "litmus-pod-delete"
+	LitmusPodIoStress            LitmusType   = "litmus-pod-io-stress"
+	LitmusContainerKill          LitmusType   = "litmus-container-kill"
+	LitmusPodMemoryStress        LitmusType   = "litmus-pod-memory-stress"
+	LitmusPodCpuStress           LitmusType   = "litmus-pod-cpu-stress"
+	GodzillaPodNetworkDelay      GodzillaType = "godzilla-pod-network-delay"
+	GodzillaPodNetworkCorruption GodzillaType = "godzilla-pod-network-corruption"
 )
 
 type ChaosStep struct {

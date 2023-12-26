@@ -31,7 +31,7 @@ func Run(jobName string, step v1alpha1.ChaosStep, generation int64) {
 		runPodStress(jobName, step, generation)
 	case string(v1alpha1.LitmusContainerKill):
 		runContainerKill(jobName, step, generation)
-	case string(v1alpha1.GodzillaPodNetworkDelay):
+	case string(v1alpha1.GodzillaPodNetworkDelay), string(v1alpha1.GodzillaPodNetworkCorruption):
 		runNetworkChaos(jobName, step, generation)
 	default:
 		logrus.Errorf("%s type not found", step.Type)

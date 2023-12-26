@@ -1,0 +1,30 @@
+apiVersion: godzilla-chaos.io/v1alpha1
+kind: GodzillaJob
+metadata:
+  labels:
+    app.kubernetes.io/name: godzillajob
+    app.kubernetes.io/instance: godzillajob-sample
+    app.kubernetes.io/part-of: godzilla-operator
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: godzilla-operator
+  name: godzillajob-sample
+  namespace: godzilla-operator-system
+spec:
+  steps:
+    - - type: godzilla-pod-network-delay
+        name: test
+        config:
+          TOTAL_CHAOS_DURATION: '120'
+          PODS_AFFECTED_PERC: '100'
+          APP_LABEL: app=debug
+          APP_NAMESPACE: godzilla-operator-system
+          APP_CONTAINER: ''
+          CONTAINER_RUNTIME: docker
+          SOCKET_PATH: /var/run/docker.sock
+          DESTINATION_IPS: 10.10.10.10
+          DESTINATION_PORTS: '80'
+          SOURCE_PORTS: '80'
+          NETWORK_INTERFACE: eth0
+          STRESS_TYPE: network-corruption
+          DESTINATION_HOSTS: www.baidu.com
+          NETWORK_CORRUPTION_RATE: '80'

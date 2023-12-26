@@ -49,6 +49,8 @@ var (
 	podCpuStress []byte
 	//go:embed pod-network-delay.yaml
 	podNetworkDelay []byte
+	//go:embed pod-network-corruption.yaml
+	podNetworkCorruption []byte
 )
 
 func PopulateDefault(chaosType string) (config PodConfig) {
@@ -90,6 +92,11 @@ func PopulateDefault(chaosType string) (config PodConfig) {
 		err = yaml.Unmarshal(podNetworkDelay, &typeConfig)
 		if err != nil {
 			logrus.Fatalf("unmarshal pod network delay yaml file failed, reason: %s", err.Error())
+		}
+	case string(godzillachaosiov1alpha1.GodzillaPodNetworkCorruption):
+		err = yaml.Unmarshal(podNetworkCorruption, &typeConfig)
+		if err != nil {
+			logrus.Fatalf("unmarshal pod network corruption yaml file failed, reason: %s", err.Error())
 		}
 	}
 	config = commonConfig
