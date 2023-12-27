@@ -117,7 +117,7 @@ func UpdateSnapshot(jobName, stepName, reason string, generation int64, stepStat
 		Name:      name,
 	}, &snapshot)
 	if err != nil {
-		logrus.Error()
+		logrus.Error(err)
 		return err
 	}
 	logrus.Infof("updating snapshot for %s", snapshot.Name)

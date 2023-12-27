@@ -71,7 +71,7 @@ func PreCheck(job v1alpha1.GodzillaJob) error {
 			case string(v1alpha1.LitmusPodDelete), string(v1alpha1.LitmusPodIoStress), string(v1alpha1.LitmusContainerKill),
 				string(v1alpha1.LitmusPodCpuStress), string(v1alpha1.LitmusPodMemoryStress), string(v1alpha1.GodzillaPodNetworkDelay),
 				string(v1alpha1.GodzillaPodNetworkCorruption), string(v1alpha1.GodzillaPodNetworkLoss), string(v1alpha1.GodzillaPodNetworkDuplicate),
-				string(v1alpha1.GodzillaPodNetworkReorder):
+				string(v1alpha1.GodzillaPodNetworkReorder), string(v1alpha1.GodzillaPodAutoscaler):
 			default:
 				msg := fmt.Sprintf("unsupported type %s", j.Type)
 				err := UpdateJobStatus(fmt.Sprintf("%s-%v", job.Name, job.Generation),

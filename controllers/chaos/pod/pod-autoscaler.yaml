@@ -1,0 +1,6 @@
+env:
+  APP_KIND: deployment
+  APP_NAME:
+  APP_NAMESPACE:
+  CHAOS_INTERVAL: '10'
+  TARGET_NUMBER: '5'

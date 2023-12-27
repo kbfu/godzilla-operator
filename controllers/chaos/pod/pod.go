@@ -57,6 +57,8 @@ var (
 	podNetworkDup []byte
 	//go:embed pod-network-reorder.yaml
 	podNetworkReorder []byte
+	//go:embed pod-autoscaler.yaml
+	podAutoscaler []byte
 )
 
 func PopulateDefault(chaosType string) (config PodConfig) {
@@ -118,6 +120,11 @@ func PopulateDefault(chaosType string) (config PodConfig) {
 		err = yaml.Unmarshal(podNetworkReorder, &typeConfig)
 		if err != nil {
 			logrus.Fatalf("unmarshal pod network reorder yaml file failed, reason: %s", err.Error())
+		}
+	case string(godzillachaosiov1alpha1.GodzillaPodAutoscaler):
+		err = yaml.Unmarshal(podAutoscaler, &typeConfig)
+		if err != nil {
+			logrus.Fatalf("unmarshal pod autoscaler yaml file failed, reason: %s", err.Error())
 		}
 	}
 	config = commonConfig

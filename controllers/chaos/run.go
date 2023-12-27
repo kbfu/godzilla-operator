@@ -34,6 +34,8 @@ func Run(jobName string, step v1alpha1.ChaosStep, generation int64) {
 	case string(v1alpha1.GodzillaPodNetworkDelay), string(v1alpha1.GodzillaPodNetworkCorruption), string(v1alpha1.GodzillaPodNetworkLoss),
 		string(v1alpha1.GodzillaPodNetworkDuplicate), string(v1alpha1.GodzillaPodNetworkReorder):
 		runNetworkChaos(jobName, step, generation)
+	case string(v1alpha1.GodzillaPodAutoscaler):
+		runPodAutoscaler(jobName, step, generation)
 	default:
 		logrus.Errorf("%s type not found", step.Type)
 	}
