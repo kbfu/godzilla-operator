@@ -1,0 +1,6 @@
+env:
+  APP_CONTAINER: ''
+  CONTAINER_RUNTIME: docker
+  SOCKET_PATH: /var/run/docker.sock
+  FILL_PATH: /root
+  FILL_SIZE: 100M

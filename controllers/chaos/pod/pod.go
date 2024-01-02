@@ -59,6 +59,8 @@ var (
 	podNetworkReorder []byte
 	//go:embed pod-autoscaler.yaml
 	podAutoscaler []byte
+	//go:embed pod-disk-fill.yaml
+	podDiskFill []byte
 )
 
 func PopulateDefault(chaosType string) (config PodConfig) {
@@ -125,6 +127,11 @@ func PopulateDefault(chaosType string) (config PodConfig) {
 		err = yaml.Unmarshal(podAutoscaler, &typeConfig)
 		if err != nil {
 			logrus.Fatalf("unmarshal pod autoscaler yaml file failed, reason: %s", err.Error())
+		}
+	case string(godzillachaosiov1alpha1.GodzillaPodDiskFill):
+		err = yaml.Unmarshal(podDiskFill, &typeConfig)
+		if err != nil {
+			logrus.Fatalf("unmarshal pod disk fill yaml file failed, reason: %s", err.Error())
 		}
 	}
 	config = commonConfig

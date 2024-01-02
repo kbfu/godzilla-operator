@@ -54,6 +54,7 @@ const (
 	GodzillaPodNetworkDuplicate  GodzillaType = "godzilla-pod-network-duplicate"
 	GodzillaPodNetworkReorder    GodzillaType = "godzilla-pod-network-reorder"
 	GodzillaPodAutoscaler        GodzillaType = "godzilla-pod-autoscaler"
+	GodzillaPodDiskFill          GodzillaType = "godzilla-pod-disk-fill"
 )
 
 type ChaosStep struct {

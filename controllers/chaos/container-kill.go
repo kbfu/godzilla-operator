@@ -60,7 +60,7 @@ func runContainerKill(chaosJobName string, step v1alpha1.ChaosStep, generation i
 		}
 	}
 	logrus.Infof("pods for step %s created", step.Name)
-
+	UpdateSnapshot(chaosJobName, step.Name, "", generation, v1alpha1.RunningStatus)
 	// watch for the status
 	w, err := env.KubeClient.CoreV1().Pods(env.JobNamespace).Watch(context.TODO(), metaV1.ListOptions{
 		LabelSelector: fmt.Sprintf("chaos.job.generation=%v,chaos.step.name=%s,chaos.job.name=%s", generation, step.Name, chaosJobName),

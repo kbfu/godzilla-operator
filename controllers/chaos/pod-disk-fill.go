@@ -33,7 +33,7 @@ import (
 	"time"
 )
 
-func podStressJob(chaosJobName string, step v1alpha1.ChaosStep, generation int64, nodeName, podName string) batchV1.Job {
+func podDiskFillJob(chaosJobName string, step v1alpha1.ChaosStep, generation int64, nodeName, podName string) batchV1.Job {
 	var envs []coreV1.EnvVar
 	termination, _ := strconv.ParseInt(step.Config["TERMINATION_GRACE_PERIOD_SECONDS"], 10, 64)
 	jobName := fmt.Sprintf("%s-%s", step.Name, utils.RandomString(10))
@@ -105,7 +105,7 @@ func podStressJob(chaosJobName string, step v1alpha1.ChaosStep, generation int64
 								},
 							},
 							Command:         []string{"/bin/bash"},
-							Args:            []string{"-c", "./helpers -name stress-chaos"},
+							Args:            []string{"-c", "./helpers -name godzilla-disk-fill"},
 							Name:            step.Name,
 							Image:           step.Image,
 							Env:             envs,
@@ -129,7 +129,7 @@ func podStressJob(chaosJobName string, step v1alpha1.ChaosStep, generation int64
 	return job
 }
 
-func runPodStress(chaosJobName string, step v1alpha1.ChaosStep, generation int64) {
+func runPodDiskFill(chaosJobName string, step v1alpha1.ChaosStep, generation int64) {
 	start := time.Now().Unix()
 	duration, _ := strconv.Atoi(step.Config["TOTAL_CHAOS_DURATION"])
 	elapsed := int(start) + duration
@@ -146,7 +146,7 @@ func runPodStress(chaosJobName string, step v1alpha1.ChaosStep, generation int64
 		if step.Config["APP_CONTAINER"] == "" {
 			step.Config["APP_CONTAINER"] = pods[i].Spec.Containers[0].Name
 		}
-		job := podStressJob(chaosJobName, step, generation, pods[i].Spec.NodeName, pods[i].Name)
+		job := podDiskFillJob(chaosJobName, step, generation, pods[i].Spec.NodeName, pods[i].Name)
 		_, err := env.KubeClient.BatchV1().Jobs(env.JobNamespace).Create(context.TODO(), &job, metaV1.CreateOptions{})
 		if err != nil {
 			// update status
