@@ -12,7 +12,7 @@ metadata:
   name: godzillajob-editor-role
 rules:
 - apiGroups:
-  - helm-chaos.io
+  - charts-chaos.io
   resources:
   - godzillajobs
   verbs:
@@ -24,7 +24,7 @@ rules:
   - update
   - watch
 - apiGroups:
-  - helm-chaos.io
+  - charts-chaos.io
   resources:
   - godzillajobs/status
   verbs:

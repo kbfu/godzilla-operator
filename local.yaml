@@ -3,7 +3,7 @@ kind: ServiceAccount
 apiVersion: v1
 metadata:
   name: chaos-admin
-  namespace: helm-operator-system
+  namespace: charts-operator-system
 ---
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
@@ -28,7 +28,7 @@ metadata:
 subjects:
   - kind: ServiceAccount
     name: chaos-admin
-    namespace: helm-operator-system
+    namespace: charts-operator-system
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole

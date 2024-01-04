@@ -37,12 +37,12 @@ type GodzillaJobReconciler struct {
 	Scheme *runtime.Scheme
 }
 
-//+kubebuilder:rbac:groups=helm-chaos.io,resources=godzillajobs,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=helm-chaos.io,resources=godzillajobs/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=helm-chaos.io,resources=godzillajobs/finalizers,verbs=update
-//+kubebuilder:rbac:groups=helm-chaos.io,resources=godzillajobsnapshots,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=helm-chaos.io,resources=godzillajobsnapshots/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=helm-chaos.io,resources=godzillajobsnapshots/finalizers,verbs=update
+//+kubebuilder:rbac:groups=charts-chaos.io,resources=godzillajobs,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=charts-chaos.io,resources=godzillajobs/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=charts-chaos.io,resources=godzillajobs/finalizers,verbs=update
+//+kubebuilder:rbac:groups=charts-chaos.io,resources=godzillajobsnapshots,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=charts-chaos.io,resources=godzillajobsnapshots/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=charts-chaos.io,resources=godzillajobsnapshots/finalizers,verbs=update
 //+kubebuilder:rbac:groups=batch,resources=jobs,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=core,resources=pods,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=apps,resources=deployments,verbs=get;list;watch;create;update;patch;delete

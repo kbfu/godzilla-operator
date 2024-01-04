@@ -4,7 +4,7 @@ metadata:
   labels:
     app: chaos
   name: chaos
-  namespace: helm-operator-system
+  namespace: charts-operator-system
 spec:
   template:
     spec:

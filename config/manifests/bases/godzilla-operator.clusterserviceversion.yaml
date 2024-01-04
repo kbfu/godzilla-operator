@@ -13,16 +13,16 @@ spec:
     - description: GodzillaJob is the Schema for the godzillajobs API
       displayName: Godzilla Job
       kind: GodzillaJob
-      name: godzillajobs.helm-chaos.io
+      name: godzillajobs.charts-chaos.io
       version: v1alpha1
     - description: GodzillaJobSnapshot is the Schema for the godzillajobsnapshots
         API
       displayName: Godzilla Job Snapshot
       kind: GodzillaJobSnapshot
-      name: godzillajobsnapshots.helm-chaos.io
+      name: godzillajobsnapshots.charts-chaos.io
       version: v1alpha1
-  description: helm-operator
-  displayName: helm-operator
+  description: charts-operator
+  displayName: charts-operator
   icon:
   - base64data: ""
     mediatype: ""
@@ -49,5 +49,5 @@ spec:
     name: kbfu
   maturity: alpha
   provider:
-    name: helm
+    name: charts
   version: 0.0.0

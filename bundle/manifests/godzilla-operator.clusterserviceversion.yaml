@@ -68,16 +68,16 @@ spec:
     - description: GodzillaJob is the Schema for the godzillajobs API
       displayName: Godzilla Job
       kind: GodzillaJob
-      name: godzillajobs.helm-chaos.io
+      name: godzillajobs.charts-chaos.io
       version: v1alpha1
     - description: GodzillaJobSnapshot is the Schema for the godzillajobsnapshots
         API
       displayName: Godzilla Job Snapshot
       kind: GodzillaJobSnapshot
-      name: godzillajobsnapshots.helm-chaos.io
+      name: godzillajobsnapshots.charts-chaos.io
       version: v1alpha1
-  description: helm-operator
-  displayName: helm-operator
+  description: charts-operator
+  displayName: charts-operator
   icon:
   - base64data: ""
     mediatype: ""
@@ -110,7 +110,7 @@ spec:
           - update
           - watch
         - apiGroups:
-          - helm-chaos.io
+          - charts-chaos.io
           resources:
           - godzillajobs
           verbs:
@@ -122,13 +122,13 @@ spec:
           - update
           - watch
         - apiGroups:
-          - helm-chaos.io
+          - charts-chaos.io
           resources:
           - godzillajobs/finalizers
           verbs:
           - update
         - apiGroups:
-          - helm-chaos.io
+          - charts-chaos.io
           resources:
           - godzillajobs/status
           verbs:
@@ -136,7 +136,7 @@ spec:
           - patch
           - update
         - apiGroups:
-          - helm-chaos.io
+          - charts-chaos.io
           resources:
           - godzillajobsnapshots
           verbs:
@@ -148,13 +148,13 @@ spec:
           - update
           - watch
         - apiGroups:
-          - helm-chaos.io
+          - charts-chaos.io
           resources:
           - godzillajobsnapshots/finalizers
           verbs:
           - update
         - apiGroups:
-          - helm-chaos.io
+          - charts-chaos.io
           resources:
           - godzillajobsnapshots/status
           verbs:
@@ -173,17 +173,17 @@ spec:
           - subjectaccessreviews
           verbs:
           - create
-        serviceAccountName: helm-operator-controller-manager
+        serviceAccountName: charts-operator-controller-manager
       deployments:
       - label:
           app.kubernetes.io/component: manager
-          app.kubernetes.io/created-by: helm-operator
+          app.kubernetes.io/created-by: charts-operator
           app.kubernetes.io/instance: controller-manager
           app.kubernetes.io/managed-by: kustomize
           app.kubernetes.io/name: deployment
-          app.kubernetes.io/part-of: helm-operator
+          app.kubernetes.io/part-of: charts-operator
           control-plane: controller-manager
-        name: helm-operator-controller-manager
+        name: charts-operator-controller-manager
         spec:
           replicas: 1
           selector:
@@ -272,7 +272,7 @@ spec:
                     - ALL
               securityContext:
                 runAsNonRoot: true
-              serviceAccountName: helm-operator-controller-manager
+              serviceAccountName: charts-operator-controller-manager
               terminationGracePeriodSeconds: 10
       permissions:
       - rules:
@@ -307,7 +307,7 @@ spec:
           verbs:
           - create
           - patch
-        serviceAccountName: helm-operator-controller-manager
+        serviceAccountName: charts-operator-controller-manager
     strategy: deployment
   installModes:
   - supported: false
@@ -328,5 +328,5 @@ spec:
     name: kbfu
   maturity: alpha
   provider:
-    name: helm
+    name: charts
   version: 0.0.1

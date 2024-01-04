@@ -25,7 +25,7 @@ import (
 )
 
 var (
-	JobNamespace = populateEnv("JOB_NAMESPACE", "helm-operator-system").(string)
+	JobNamespace = populateEnv("JOB_NAMESPACE", "charts-operator-system").(string)
 	LocalDebug   = populateEnv("LOCAL_DEBUG", false).(bool)
 )
 
