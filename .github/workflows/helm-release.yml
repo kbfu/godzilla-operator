@@ -7,6 +7,8 @@ on:
 
 jobs:
   release:
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -23,5 +25,6 @@ jobs:
         uses: helm/chart-releaser-action@v1.5.0
         with:
           charts_dir: .
+          charts_repo_url: https://<owner>.github.io/helm-charts
         env:
           CR_TOKEN: "${{ secrets.TOKEN }}"
