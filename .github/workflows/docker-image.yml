@@ -3,10 +3,9 @@ name: Docker Image CI
 on:
   push:
     tags-ignore:
-      - godzilla.*
-    branches-ignore:
-      - gh-pages
-      - main
+      - godzilla*
+    branches:
+      - dev
 
 jobs:
   build:
