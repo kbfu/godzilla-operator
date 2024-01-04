@@ -4,8 +4,9 @@ on:
   push:
     tags-ignore:
       - godzilla.*
-    branches:
-      - dev
+    branches-ignore:
+      - gh-pages
+      - main
 
 jobs:
   build:
