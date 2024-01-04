@@ -1,25 +1,24 @@
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
-  name: godzillajobsnapshots.godzilla-chaos.io
+  name: godzillajobs.godzilla-chaos.io
   annotations:
     controller-gen.kubebuilder.io/version: v0.11.1
   labels:
-  {{- include "chart.labels" . | nindent 4 }}
+  {{- include "godzilla.labels" . | nindent 4 }}
 spec:
-  group: godzilla-chaos.io
+  group: helm-chaos.io
   names:
-    kind: GodzillaJobSnapshot
-    listKind: GodzillaJobSnapshotList
-    plural: godzillajobsnapshots
-    singular: godzillajobsnapshot
+    kind: GodzillaJob
+    listKind: GodzillaJobList
+    plural: godzillajobs
+    singular: godzillajob
   scope: Namespaced
   versions:
   - name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: GodzillaJobSnapshot is the Schema for the godzillajobsnapshots
-          API
+        description: GodzillaJob is the Schema for the godzillajobs API
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -34,7 +33,7 @@ spec:
           metadata:
             type: object
           spec:
-            description: GodzillaJobSnapshotSpec defines the desired state of GodzillaJobSnapshot
+            description: GodzillaJobSpec defines the desired state of GodzillaJob
             properties:
               steps:
                 description: 'INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
@@ -46,22 +45,17 @@ spec:
                         additionalProperties:
                           type: string
                         type: object
-                      failedReason:
-                        type: string
                       image:
                         type: string
                       name:
                         type: string
                       serviceAccountName:
                         type: string
-                      status:
-                        type: string
                       type:
                         type: string
                     required:
                     - config
                     - name
-                    - serviceAccountName
                     - type
                     type: object
                   type: array
@@ -70,17 +64,7 @@ spec:
             - steps
             type: object
           status:
-            description: GodzillaJobSnapshotStatus defines the observed state of GodzillaJobSnapshot
-            properties:
-              failedReason:
-                type: string
-              jobStatus:
-                description: 'INSERT ADDITIONAL STATUS FIELD - define observed state
-                  of cluster Important: Run "make" to regenerate code after modifying
-                  this file'
-                type: string
-            required:
-            - jobStatus
+            description: GodzillaJobStatus defines the observed state of GodzillaJob
             type: object
         type: object
     served: true

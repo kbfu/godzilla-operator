@@ -12,7 +12,7 @@ metadata:
   name: godzillajob-viewer-role
 rules:
 - apiGroups:
-  - godzilla-chaos.io
+  - helm-chaos.io
   resources:
   - godzillajobs
   verbs:
@@ -20,7 +20,7 @@ rules:
   - list
   - watch
 - apiGroups:
-  - godzilla-chaos.io
+  - helm-chaos.io
   resources:
   - godzillajobs/status
   verbs:

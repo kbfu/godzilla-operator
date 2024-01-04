@@ -1,4 +1,4 @@
-apiVersion: godzilla-chaos.io/v1alpha1
+apiVersion: helm-chaos.io/v1alpha1
 kind: GodzillaJobSnapshot
 metadata:
   labels:

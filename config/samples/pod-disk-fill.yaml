@@ -1,4 +1,4 @@
-apiVersion: godzilla-chaos.io/v1alpha1
+apiVersion: helm-chaos.io/v1alpha1
 kind: GodzillaJob
 metadata:
   labels:
@@ -8,12 +8,12 @@ metadata:
     app.kubernetes.io/managed-by: kustomize
     app.kubernetes.io/created-by: godzilla-operator
   name: godzillajob-sample
-  namespace: godzilla-operator-system
+  namespace: helm-operator-system
 spec:
   steps:
-    - - type: godzilla-pod-disk-fill
+    - - type: helm-pod-disk-fill
         name: test
         config:
-          APP_NAMESPACE: godzilla-operator-system
+          APP_NAMESPACE: helm-operator-system
           TOTAL_CHAOS_DURATION: '600'
           APP_LABEL: app=debug

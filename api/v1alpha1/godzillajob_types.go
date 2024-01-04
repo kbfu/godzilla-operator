@@ -48,13 +48,13 @@ const (
 	LitmusContainerKill          LitmusType   = "litmus-container-kill"
 	LitmusPodMemoryStress        LitmusType   = "litmus-pod-memory-stress"
 	LitmusPodCpuStress           LitmusType   = "litmus-pod-cpu-stress"
-	GodzillaPodNetworkDelay      GodzillaType = "godzilla-pod-network-delay"
-	GodzillaPodNetworkCorruption GodzillaType = "godzilla-pod-network-corruption"
-	GodzillaPodNetworkLoss       GodzillaType = "godzilla-pod-network-loss"
-	GodzillaPodNetworkDuplicate  GodzillaType = "godzilla-pod-network-duplicate"
-	GodzillaPodNetworkReorder    GodzillaType = "godzilla-pod-network-reorder"
-	GodzillaPodAutoscaler        GodzillaType = "godzilla-pod-autoscaler"
-	GodzillaPodDiskFill          GodzillaType = "godzilla-pod-disk-fill"
+	GodzillaPodNetworkDelay      GodzillaType = "helm-pod-network-delay"
+	GodzillaPodNetworkCorruption GodzillaType = "helm-pod-network-corruption"
+	GodzillaPodNetworkLoss       GodzillaType = "helm-pod-network-loss"
+	GodzillaPodNetworkDuplicate  GodzillaType = "helm-pod-network-duplicate"
+	GodzillaPodNetworkReorder    GodzillaType = "helm-pod-network-reorder"
+	GodzillaPodAutoscaler        GodzillaType = "helm-pod-autoscaler"
+	GodzillaPodDiskFill          GodzillaType = "helm-pod-disk-fill"
 )
 
 type ChaosStep struct {

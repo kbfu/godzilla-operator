@@ -25,7 +25,7 @@ import (
 )
 
 var (
-	JobNamespace = populateEnv("JOB_NAMESPACE", "godzilla-operator-system").(string)
+	JobNamespace = populateEnv("JOB_NAMESPACE", "helm-operator-system").(string)
 	LocalDebug   = populateEnv("LOCAL_DEBUG", false).(bool)
 )
 
