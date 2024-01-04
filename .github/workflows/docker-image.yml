@@ -4,8 +4,6 @@ on:
   push:
     tags-ignore:
       - godzilla.*
-    tags:
-      - '*'
     branches:
       - dev
 
