@@ -3,6 +3,16 @@ entries:
   godzilla:
   - apiVersion: v2
     appVersion: v1.0.12
+    created: "2024-01-15T03:46:19.976168706Z"
+    description: A Helm chart for Kubernetes
+    digest: 8b3aee70e826efaa59abb3ec0d3dbc498fa211399af28062054b7bb3ab49278f
+    name: godzilla
+    type: application
+    urls:
+    - https://github.com/kbfu/godzilla-operator/releases/download/godzilla-1.0.6/godzilla-1.0.6.tgz
+    version: 1.0.6
+  - apiVersion: v2
+    appVersion: v1.0.12
     created: "2024-01-15T03:29:10.687192888Z"
     description: A Helm chart for Kubernetes
     digest: 8c48bfc92cafaa311521ea86fe5e63e34080644d0e3bc121be6ee9c46e42b419
@@ -61,4 +71,4 @@ entries:
     urls:
     - https://github.com/kbfu/godzilla-operator/releases/download/godzilla-1.0.0/godzilla-1.0.0.tgz
     version: 1.0.0
-generated: "2024-01-15T03:29:10.68722096Z"
+generated: "2024-01-15T03:46:19.976204453Z"
