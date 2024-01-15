@@ -31,8 +31,8 @@ controllerManager:
         drop:
         - ALL
     image:
-      repository: controller
-      tag: latest
+      repository: wxt432/godzilla-operator
+      tag: dev
     imagePullPolicy: Always
     resources:
       limits:

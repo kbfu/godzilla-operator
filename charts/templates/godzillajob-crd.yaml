@@ -5,9 +5,9 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.11.1
   labels:
-  {{- include "godzilla.labels" . | nindent 4 }}
+  {{- include "charts.labels" . | nindent 4 }}
 spec:
-  group: helm-chaos.io
+  group: godzilla-chaos.io
   names:
     kind: GodzillaJob
     listKind: GodzillaJobList
