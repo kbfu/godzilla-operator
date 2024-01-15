@@ -328,5 +328,5 @@ spec:
     name: kbfu
   maturity: alpha
   provider:
-    name: charts
+    name: godzilla
   version: 0.0.1
