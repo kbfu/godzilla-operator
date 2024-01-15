@@ -1,0 +1,73 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.11.1
+  creationTimestamp: null
+  name: godzillajobs.godzilla-chaos.io
+spec:
+  group: godzilla-chaos.io
+  names:
+    kind: GodzillaJob
+    listKind: GodzillaJobList
+    plural: godzillajobs
+    singular: godzillajob
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: GodzillaJob is the Schema for the godzillajobs API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: GodzillaJobSpec defines the desired state of GodzillaJob
+            properties:
+              steps:
+                description: 'INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
+                  Important: Run "make" to regenerate code after modifying this file'
+                items:
+                  items:
+                    properties:
+                      config:
+                        additionalProperties:
+                          type: string
+                        type: object
+                      image:
+                        type: string
+                      name:
+                        type: string
+                      serviceAccountName:
+                        type: string
+                      type:
+                        type: string
+                    required:
+                    - config
+                    - name
+                    - type
+                    type: object
+                  type: array
+                type: array
+            required:
+            - steps
+            type: object
+          status:
+            description: GodzillaJobStatus defines the observed state of GodzillaJob
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
