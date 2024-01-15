@@ -5,7 +5,7 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.11.1
   labels:
-  {{- include "charts.labels" . | nindent 4 }}
+  {{- include "godzilla.labels" . | nindent 4 }}
 spec:
   group: godzilla-chaos.io
   names:
