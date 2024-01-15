@@ -25,7 +25,7 @@ import (
 )
 
 var (
-	JobNamespace = populateEnv("JOB_NAMESPACE", "godzilla-operator-system").(string)
+	JobNamespace = populateEnv("JOB_NAMESPACE", "").(string)
 	LocalDebug   = populateEnv("LOCAL_DEBUG", false).(bool)
 )
 
@@ -38,9 +38,12 @@ func populateEnv(name string, defaultValue any) any {
 			}
 			return val
 		}
-	} else {
+	} else if name == "JOB_NAMESPACE" {
 		if os.Getenv(name) != "" {
 			return os.Getenv(name)
+		} else {
+			namespace, _ := os.ReadFile("/var/run/secrets/kubernetes.io/serviceaccount/namespace")
+			return string(namespace)
 		}
 	}
 
