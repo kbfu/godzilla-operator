@@ -5,4 +5,4 @@ kind: Kustomization
 images:
 - name: controller
   newName: wxt432/godzilla-operator
-  newTag: dev
+  newTag: latest

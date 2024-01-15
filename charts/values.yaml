@@ -32,7 +32,7 @@ controllerManager:
         - ALL
     image:
       repository: wxt432/godzilla-operator
-      tag: dev
+      tag: latest
     imagePullPolicy: Always
     resources:
       limits:
