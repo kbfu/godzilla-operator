@@ -68,16 +68,16 @@ spec:
     - description: GodzillaJob is the Schema for the godzillajobs API
       displayName: Godzilla Job
       kind: GodzillaJob
-      name: godzillajobs.charts-chaos.io
+      name: godzillajobs.godzilla-chaos.io
       version: v1alpha1
     - description: GodzillaJobSnapshot is the Schema for the godzillajobsnapshots
         API
       displayName: Godzilla Job Snapshot
       kind: GodzillaJobSnapshot
-      name: godzillajobsnapshots.charts-chaos.io
+      name: godzillajobsnapshots.godzilla-chaos.io
       version: v1alpha1
-  description: charts-operator
-  displayName: charts-operator
+  description: godzilla-operator
+  displayName: godzilla-operator
   icon:
   - base64data: ""
     mediatype: ""
@@ -110,7 +110,7 @@ spec:
           - update
           - watch
         - apiGroups:
-          - charts-chaos.io
+          - godzilla-chaos.io
           resources:
           - godzillajobs
           verbs:
@@ -122,13 +122,13 @@ spec:
           - update
           - watch
         - apiGroups:
-          - charts-chaos.io
+          - godzilla-chaos.io
           resources:
           - godzillajobs/finalizers
           verbs:
           - update
         - apiGroups:
-          - charts-chaos.io
+          - godzilla-chaos.io
           resources:
           - godzillajobs/status
           verbs:
@@ -136,7 +136,7 @@ spec:
           - patch
           - update
         - apiGroups:
-          - charts-chaos.io
+          - godzilla-chaos.io
           resources:
           - godzillajobsnapshots
           verbs:
@@ -148,13 +148,13 @@ spec:
           - update
           - watch
         - apiGroups:
-          - charts-chaos.io
+          - godzilla-chaos.io
           resources:
           - godzillajobsnapshots/finalizers
           verbs:
           - update
         - apiGroups:
-          - charts-chaos.io
+          - godzilla-chaos.io
           resources:
           - godzillajobsnapshots/status
           verbs:
@@ -173,17 +173,17 @@ spec:
           - subjectaccessreviews
           verbs:
           - create
-        serviceAccountName: charts-operator-controller-manager
+        serviceAccountName: godzilla-operator-controller-manager
       deployments:
       - label:
           app.kubernetes.io/component: manager
-          app.kubernetes.io/created-by: charts-operator
+          app.kubernetes.io/created-by: godzilla-operator
           app.kubernetes.io/instance: controller-manager
           app.kubernetes.io/managed-by: kustomize
           app.kubernetes.io/name: deployment
-          app.kubernetes.io/part-of: charts-operator
+          app.kubernetes.io/part-of: godzilla-operator
           control-plane: controller-manager
-        name: charts-operator-controller-manager
+        name: godzilla-operator-controller-manager
         spec:
           replicas: 1
           selector:
@@ -272,7 +272,7 @@ spec:
                     - ALL
               securityContext:
                 runAsNonRoot: true
-              serviceAccountName: charts-operator-controller-manager
+              serviceAccountName: godzilla-operator-controller-manager
               terminationGracePeriodSeconds: 10
       permissions:
       - rules:
@@ -307,7 +307,7 @@ spec:
           verbs:
           - create
           - patch
-        serviceAccountName: charts-operator-controller-manager
+        serviceAccountName: godzilla-operator-controller-manager
     strategy: deployment
   installModes:
   - supported: false

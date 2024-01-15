@@ -4,7 +4,7 @@ metadata:
   labels:
     app: chaos
   name: chaos
-  namespace: charts-operator-system
+  namespace: godzilla-operator-system
 spec:
   template:
     spec:
@@ -34,7 +34,7 @@ spec:
             - name: APP_POD
               value: debug-7c685dd495-llhfn # 参数化
             - name: APP_NAMESPACE
-              value: charts-operator-system # 参数化
+              value: godzilla-operator-system # 参数化
             - name: CONTAINER_RUNTIME
               value: docker # 参数化, containerd, docker, crio
             - name: SOCKET_PATH
