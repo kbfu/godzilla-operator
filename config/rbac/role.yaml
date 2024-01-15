@@ -54,7 +54,7 @@ rules:
   - update
   - watch
 - apiGroups:
-  - charts-chaos.io
+  - godzilla-chaos.io
   resources:
   - godzillajobs
   verbs:
@@ -66,13 +66,13 @@ rules:
   - update
   - watch
 - apiGroups:
-  - charts-chaos.io
+  - godzilla-chaos.io
   resources:
   - godzillajobs/finalizers
   verbs:
   - update
 - apiGroups:
-  - charts-chaos.io
+  - godzilla-chaos.io
   resources:
   - godzillajobs/status
   verbs:
@@ -80,7 +80,7 @@ rules:
   - patch
   - update
 - apiGroups:
-  - charts-chaos.io
+  - godzilla-chaos.io
   resources:
   - godzillajobsnapshots
   verbs:
@@ -92,13 +92,13 @@ rules:
   - update
   - watch
 - apiGroups:
-  - charts-chaos.io
+  - godzilla-chaos.io
   resources:
   - godzillajobsnapshots/finalizers
   verbs:
   - update
 - apiGroups:
-  - charts-chaos.io
+  - godzilla-chaos.io
   resources:
   - godzillajobsnapshots/status
   verbs:

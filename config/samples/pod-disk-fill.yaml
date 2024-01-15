@@ -1,4 +1,4 @@
-apiVersion: charts-chaos.io/v1alpha1
+apiVersion: godzilla-chaos.io/v1alpha1
 kind: GodzillaJob
 metadata:
   labels:
@@ -8,12 +8,12 @@ metadata:
     app.kubernetes.io/managed-by: kustomize
     app.kubernetes.io/created-by: godzilla-operator
   name: godzillajob-sample
-  namespace: charts-operator-system
+  namespace: godzilla-operator-system
 spec:
   steps:
-    - - type: charts-pod-disk-fill
+    - - type: godzilla-pod-disk-fill
         name: test
         config:
-          APP_NAMESPACE: charts-operator-system
+          APP_NAMESPACE: godzilla-operator-system
           TOTAL_CHAOS_DURATION: '600'
           APP_LABEL: app=debug

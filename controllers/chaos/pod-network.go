@@ -105,7 +105,7 @@ func podNetworkJob(chaosJobName string, step v1alpha1.ChaosStep, generation int6
 								},
 							},
 							Command:         []string{"/bin/bash"},
-							Args:            []string{"-c", "./helpers -name charts-network-chaos"},
+							Args:            []string{"-c", "./helpers -name godzilla-network-chaos"},
 							Name:            step.Name,
 							Image:           step.Image,
 							Env:             envs,

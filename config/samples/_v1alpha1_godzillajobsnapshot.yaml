@@ -1,4 +1,4 @@
-apiVersion: charts-chaos.io/v1alpha1
+apiVersion: godzilla-chaos.io/v1alpha1
 kind: GodzillaJobSnapshot
 metadata:
   labels:

@@ -105,7 +105,7 @@ func podDiskFillJob(chaosJobName string, step v1alpha1.ChaosStep, generation int
 								},
 							},
 							Command:         []string{"/bin/bash"},
-							Args:            []string{"-c", "./helpers -name charts-disk-fill"},
+							Args:            []string{"-c", "./helpers -name godzilla-disk-fill"},
 							Name:            step.Name,
 							Image:           step.Image,
 							Env:             envs,

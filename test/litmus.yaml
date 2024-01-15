@@ -4,7 +4,7 @@ metadata:
   labels:
     app: chaos
   name: chaos
-  namespace: charts-operator-system
+  namespace: godzilla-operator-system
 spec:
   template:
     spec:

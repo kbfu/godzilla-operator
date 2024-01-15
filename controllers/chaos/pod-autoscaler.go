@@ -70,7 +70,7 @@ func podAutoscalerJob(chaosJobName string, step v1alpha1.ChaosStep, generation i
 					Containers: []coreV1.Container{
 						{
 							Command:         []string{"/bin/bash"},
-							Args:            []string{"-c", "./helpers -name charts-pod-autoscaler"},
+							Args:            []string{"-c", "./helpers -name godzilla-pod-autoscaler"},
 							Name:            step.Name,
 							Image:           step.Image,
 							Env:             envs,

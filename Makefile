@@ -28,7 +28,7 @@ BUNDLE_METADATA_OPTS ?= $(BUNDLE_CHANNELS) $(BUNDLE_DEFAULT_CHANNEL)
 # This variable is used to construct full image tags for bundle and catalog images.
 #
 # For example, running 'make bundle-build bundle-push catalog-build catalog-push' will build and push both
-# charts-chaos.io/charts-operator-bundle:$VERSION and charts-chaos.io/charts-operator-catalog:$VERSION.
+# godzilla-chaos.io/godzilla-operator-bundle:$VERSION and godzilla-chaos.io/godzilla-operator-catalog:$VERSION.
 IMAGE_TAG_BASE ?= godzilla-chaos.io/godzilla-operator
 
 # BUNDLE_IMG defines the image:tag used for the bundle.

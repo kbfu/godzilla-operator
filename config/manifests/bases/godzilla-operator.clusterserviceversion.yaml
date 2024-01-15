@@ -13,16 +13,16 @@ spec:
     - description: GodzillaJob is the Schema for the godzillajobs API
       displayName: Godzilla Job
       kind: GodzillaJob
-      name: godzillajobs.charts-chaos.io
+      name: godzillajobs.godzilla-chaos.io
       version: v1alpha1
     - description: GodzillaJobSnapshot is the Schema for the godzillajobsnapshots
         API
       displayName: Godzilla Job Snapshot
       kind: GodzillaJobSnapshot
-      name: godzillajobsnapshots.charts-chaos.io
+      name: godzillajobsnapshots.godzilla-chaos.io
       version: v1alpha1
-  description: charts-operator
-  displayName: charts-operator
+  description: godzilla-operator
+  displayName: godzilla-operator
   icon:
   - base64data: ""
     mediatype: ""

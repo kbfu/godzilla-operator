@@ -6,7 +6,7 @@ metadata:
   creationTimestamp: null
   name: godzillajobs.godzilla-chaos.io
 spec:
-  group: charts-chaos.io
+  group: godzilla-chaos.io
   names:
     kind: GodzillaJob
     listKind: GodzillaJobList
